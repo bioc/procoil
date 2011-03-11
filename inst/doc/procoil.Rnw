@@ -1,0 +1,950 @@
+\documentclass[article]{bioinf}
+
+\usepackage[noae]{Sweave}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\hypersetup{colorlinks=false,
+   pdfborder=0 0 0,
+   pdftitle={PrOCoil - A Web Service and an R Package for Predicting the Oligomerization of Coiled Coil Proteins},
+   pdfauthor={Ulrich Bodenhofer}}
+
+\title{PrOCoil --- A Web Service and an \R\ Package for\\ Predicting the Oligomerization of\\ Coiled Coil Proteins}
+\author{Ulrich Bodenhofer}
+\affiliation{Institute of Bioinformatics, Johannes Kepler University
+Linz\\Altenberger Str. 69, 4040 Linz, Austria\\
+\email{procoil@bioinf.jku.at}}
+
+\newcommand{\PrOCoil}{PrOCoil}
+\newcommand{\R}{R}
+
+% \VignetteIndexEntry{PrOCoil - A Web Service and an R Package for Predicting the Oligomerization of Coiled-Coil Proteins}
+% \VignetteDepends{methods, stats, graphics, utils}
+
+\SweaveOpts{eps=FALSE}
+\setlength{\fboxrule}{1.5pt}
+
+\begin{document}
+<<LoadPackageToDetermineVersion,echo=FALSE>>=
+options(width=65)
+set.seed(0)
+library(procoil)
+procoilver<-packageDescription("procoil")$Version
+@
+\newcommand{\PrOCoilVer}{\Sexpr{procoilver}}
+\manualtitlepage[Version \PrOCoilVer, \today]
+
+\section*{Scope and Purpose of this Document}
+
+This document is a user manual for \PrOCoil, the software suite accompanying
+the paper \cite{MahrenholzAbfalterBodenhoferVolkmerHochreiter11}.
+It provides a gentle
+introduction into how to use \PrOCoil. Not all features of the \R\
+package are described in full detail. Such details can be obtained
+from the documentation enclosed in the  \R\ package. Further note
+the following: (1) this is not an introduction to coiled coil
+proteins; (2) this is not an introduction to \R; (3) this is not an
+introduction to support vector machines. If you lack the background
+for understanding this manual, you first have to read introductory
+literature on the subjects mentioned above.
+
+\vspace{1cm}
+
+\newlength{\auxparskip}
+\setlength{\auxparskip}{\parskip}
+\setlength{\parskip}{0pt}
+\tableofcontents
+\clearpage
+\setlength{\parskip}{\auxparskip}
+
+\newlength{\Nboxwidth}
+\setlength{\Nboxwidth}{\textwidth}
+\addtolength{\Nboxwidth}{-2\fboxrule}
+\addtolength{\Nboxwidth}{-2\fboxsep}
+
+\newcommand{\notebox}[1]{%
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\begin{minipage}{\Nboxwidth}
+\noindent{\sffamily\bfseries Note:} #1
+\end{minipage}}
+\end{center}}
+
+\section{Introduction}
+
+This user manual describes the \PrOCoil\ software suite that accompanies
+the paper \cite{MahrenholzAbfalterBodenhoferVolkmerHochreiter11}. This
+software is concerned with analyzing coiled coil sequences in terms
+of their oligomerization behavior. \PrOCoil\ does not only provide a
+prediction, but also detailed insights into which residues or
+sub-sequences are responsible for the predicted oligomerization.
+
+\PrOCoil\ is available both as an easy-to-use Web interface and an
+\R\ package. Both variants offer the same prediction and analysis
+facilities. The following table summarizes the essential
+differences:
+
+\begin{center}
+\begin{tabular}{|p{0.4\textwidth}|p{0.4\textwidth}|}
+\hline
+\PrOCoil\ Web interface & \PrOCoil\ \R\  package\\
+\hline \hline
+can be used instantly on any computer with Internet access and a Web browser &
+requires \R\  and installation of package {\ttfamily
+procoil}
+\\
+\hline
+supports only the standard \PrOCoil\ model &
+supports the standard \PrOCoil\ model and the alternative model optimized
+for balanced accuracy; other models can be loaded from files
+\\
+\hline
+graphics are produced in a non-customizable standard format
+& graphics are customizable
+\\
+\hline
+every sequence must be analyzed separately &
+analyses can be automated and run in batch mode through \R's
+scripting environment
+\\
+\hline
+beside standard input (amino acid sequence $+$ aligned heptad
+annotation), also PairCoil2 output format is
+supported; Marcoil output can be used upon a separate
+pre-processing step &
+only standard input (amino acid sequence $+$ aligned heptad
+annotation)
+\\
+\hline
+\end{tabular}
+\end{center}
+
+We recommend beginners to use the Web interface. Experienced users
+can benefit from the greater flexibility of the \R\ package. \R\ package users
+can use the Web interface for converting PairCoil2
+and/or Marcoil output into the input format the \R\  package
+requires.
+
+\section{Input Data}\label{sec:input}
+
+As already mentioned, \PrOCoil\ predicts whether a given coiled coil
+segment of an amino acid sequence is more likely to form a dimer or
+trimer. Such a segment has to consist of an amino acid
+(sub-)sequence and an aligned heptad annotation of the same length.
+As an example, the GCN4 yeast transcription factor is a dimer
+consisting of two equal sequences (i.e.\ it is a homo-dimer), the
+coiled coil parts of which (according to  SOCKET
+\cite{WalshawWoolfson01}) look as follows:
+\begin{quote}
+{\footnotesize\begin{verbatim}
+MKQLEDKVEELLSKNYHLENEVARLKKLV
+abcdefgabcdefgabcdefgabcdefga
+\end{verbatim}}
+\end{quote}
+The heptad annotation is essential for \PrOCoil\ to work and cannot
+be omitted. The letters `\verb+a+'--`\verb+g+' correspond to the
+usual annotation of positions within the heptad motif. \PrOCoil\ can
+also process full amino acid sequences containing one or more coiled
+coil segments as sub-sequences, where the coiled coil segments must
+be annotated with the usual symbols `\verb+a+'--`\verb+g+' and
+non-coiled coil residues must be annotated with dashes `\verb+-+'.
+As an example, let us consider the sample sequence used in the
+Marcoil Web
+interface\footnote{\url{http://www.isrec.isb-sib.ch/webmarcoil/webmarcoilC1.html}}
+\cite{DelorenziSpeed02} (annotation derived
+from running Marcoil on this sequence with a cut-off of 50\%):
+\begin{quote}
+{\footnotesize\begin{verbatim}
+MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG
+-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------
+\end{verbatim}}
+\end{quote}
+If the heptad annotation contains dashes, \PrOCoil\ extracts all
+coiled coil regions (contiguous non-dash regions) and classifies
+them separately. From the Marcoil sample sequence, \PrOCoil\ will
+extract and classify the following coiled coil segment (residues
+32--66 of the above example):
+\begin{quote}
+{\footnotesize\begin{verbatim}
+LENLRQFAENLRQNIENVHSFLENLRADLENLRQK
+abcdefgabcdefgabcdefgabcdefgabcdefg
+\end{verbatim}}
+\end{quote}
+
+\section{Predictions Using the Web Interface}\label{sec:webpredict}
+
+The \PrOCoil\ Web interface can be accessed directly via the
+\PrOCoil\
+homepage.\footnote{\url{http://www.bioinf.jku.at/software/procoil/}}
+The page contains an input field that is pre-filled with the GCN4
+wild type as an example:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.75\textwidth]{Input}}
+\end{center}
+
+The \PrOCoil\ server first checks your input for validity (see
+Section\ \ref{sec:input}). If the input is correct, all coiled coil
+segments are extracted from the input and analyzed separately. For
+the standard example, the GCN4 wild type, the output looks as
+follows:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.75\textwidth]{GCN4output}}
+\end{center}
+
+The output of the \PrOCoil\ Web interface is structured into three
+sections:
+\begin{description}
+\item[Input data:] amino acid sequence and heptad annotation of the coiled
+coil segment;
+\item[Classification result:] discriminant function value and final
+classification; a positive value means that the sequence is classified
+as trimer, a negative value means that the sequence is classified as
+dimer. The higher the absolute value, the clearer the oligomerization
+tendency is. The closer the value is to zero, the more the sequence can be
+considered a borderline case.
+\item[Prediction profile:] this plot shows
+the contribution of each residue to the discriminant function value.
+The more positive a value is for a residue, the more this residue
+contributes to an oligomerization tendency towards trimers. The more
+negative the value is, the more this residue contributes to an
+oligomerization tendency towards dimers. The horizontal line
+corresponds to the base line of the classifier (see \ref{ssec:profiles}).
+The discriminant
+function value is actually obtained as the area above the grey
+baseline minus the area below the grey baseline. The links below the
+prediction profile plot allow for downloading the profile in various
+formats.
+\end{description}
+
+\notebox{Values in the prediction profile cannot be
+understood as general rules for which oligomerization behavior a
+given amino acid at a given heptad position is indicative for.
+\PrOCoil\ takes pairwise interactions of amino acids into account.
+Therefore, the values in the prediction profile are always to be
+considered in the context of the given sequence. The same amino acid
+at the same heptad position might have a completely different
+value in the prediction profile of a different sequence.}
+
+\pagebreak
+
+If the heptad annotation contains at least one dash `\verb+-+',
+\PrOCoil\ first extracts all coiled coil segments, i.e.\ all
+contiguous sub-sequences with no dashes in the heptad annotation.
+Then all these coiled coil segments are analyzed independently and
+the results are presented sequentially in the order they appear in
+the input sequence in the same format as above. The only notable
+difference is that the section ``Input data'' shows the complete
+input sequence, whereas the extracted coiled coil segment is
+displayed in a separate section ``Coiled coil segment'' along with
+its consecutive number and the corresponding start and end positions
+in the input sequence. For the Marcoil sample sequence, the output
+looks as follows:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.75\textwidth]{MarcoilOut}}
+\end{center}
+
+The \PrOCoil\ Web interface also facilitates easy analysis of mutations of
+coiled coil segments. This feature is limited to two sequences at a time.
+The two sequences must have the same length and heptad register. If these
+conditions are met, the second sequence can simply be written underneath
+the heptad register (with the first sequence remaining above the heptad
+register):
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.75\textwidth]{MutationAnalysisInput}}
+\end{center}
+
+The output is structured as described for single sequences. The section
+``Classification result'' shows discriminant function values and predictions
+of both sequences along with a comparison whether the second sequence is
+more dimeric or more trimeric than the first sequence. Only one profile
+plot is produced in which both profiles are visualized, the profile of
+the first sequence in red and the second sequence's profile in blue:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.75\textwidth]{MutationAnalysisOutput}}
+\end{center}
+
+
+\section{Preprocessing Predicted Coiled Coil Segments Using the Web
+interface}\label{sec:preproc}
+
+We expect \PrOCoil\ to be used mainly for sequences the exact 3D
+structures of which are unknown (otherwise the correct
+oligomerization can be determined using SOCKET
+\cite{WalshawWoolfson01}). For structurally unresolved sequences, a
+coiled coil predictor must be used first to determine the coiled
+coil segments and their presumed heptad annotations. Currently the
+two most commonly used predictors for this task are {\bf Marcoil}
+\cite{DelorenziSpeed02} and {\bf PairCoil2}
+\cite{BergerWilsonWolfTonchevMillaKim95,McDonnellJiangKeatingBerger06}.
+Both programs have their own output formats that do not comply with
+the format described in Section\ \ref{sec:input}. In order to ease
+integration with Marcoil and PairCoil2, the \PrOCoil\ Web interface
+offers preprocessing tools that allow to use the outputs of Marcoil
+and PairCoil2 for processing with \PrOCoil.
+
+\subsection{Processing PairCoil2 results}
+
+The PairCoil2 Web
+interface\footnote{\url{http://groups.csail.mit.edu/cb/paircoil2/paircoil2.html}}
+produces the following kind of output for the Marcoil sample
+sequence:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.6\textwidth]{PairCoil2output}}
+\end{center}
+
+If you click the link ``Positions and registers'', a text file with the
+predicted heptad annotation is displayed. Select
+the lines with the amino acids and heptad annotations in the following
+way:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.7\textwidth]{PairCoil2sel}}
+\end{center}
+
+Now copy this selection into the
+input field of the \PrOCoil\ Web interface. If you check ``Accept
+PairCoil2 output format'', you can directly process the PairCoil2
+output with \PrOCoil:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.75\textwidth]{PairCoil2input}}
+\end{center}
+
+
+
+\subsection{Processing Marcoil results}
+
+If you submit a sequence to the Marcoil Web
+interface,\footnote{\url{http://www.isrec.isb-sib.ch/webmarcoil/webmarcoilC1.html}} the
+results are shown as an HTML text in your Web browser. Scroll down
+to the section ``3. LIST WITH [COILED-COIL PROBABILITY IN PERCENT]
+AND HEPTAD PHASE WITH HIGHEST PROBABILITY '' and select the whole
+section (without the heading) as follows:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.7\textwidth]{Marcoil}}
+\end{center}
+
+These data cannot be processed by \PrOCoil\ directly, since coiled
+coil segments must first be singled out by applying a probability
+cut-off threshold. For this purpose, a separate input field is
+available at the bottom of the \PrOCoil\ Web page. Copy the
+selection into this field and choose a probability cut-off (by default
+50\%):
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.75\textwidth]{MarcoilPreProc}}
+\end{center}
+
+After clicking ``Submit'', an output page is displayed that shows
+the result of applying the chosen probability cut-off in a read-only
+field at the bottom:
+
+\begin{center}
+\fcolorbox{bioaz}{biowh}{\includegraphics[width=0.75\textwidth]{MarcoilPreProcOut}}
+\end{center}
+
+If you are satisfied with the result, you
+can directly pass the data to \PrOCoil\ by clicking ``Proceed to
+PrOCoil''. If you think you should have used a different
+threshold, your input is displayed in the input field on top of the page.
+Select a different threshold until the result meets your expectation and then
+pass the data to \PrOCoil.
+
+\clearpage
+
+\section{\PrOCoil\ \R\ Package}
+
+\subsection{Installation}
+
+The \PrOCoil\ \R\ package (current version: \PrOCoilVer) is
+available via Bioconductor. The simplest way to install the package
+is the following:
+<<InstallPrOCoil,eval=FALSE>>=
+source("http://www.bioconductor.org/biocLite.R")
+biocLite("procoil")
+@
+
+If you wish to install the package manually instead, you can download
+the package archive that fits best to your computer system
+from the Bioconductor homepage.
+
+\subsection{Getting started}\label{ssec:getstarted}
+
+To load the \PrOCoil\ package, enter
+<<LoadPrOCoil,eval=FALSE>>=
+library(procoil)
+@
+in your \R\ session. If this command terminates without any error
+message or warning, you can be sure that the \PrOCoil\ package has
+been installed successfully. If so, the \PrOCoil\ package is ready
+for use now and you can start predicting the oligomerization of
+coiled coils.
+
+As a first example, the following command makes a prediction for the
+GCN4 wild type already used above:
+<<PredictGCN4WildType>>=
+GCN4wt <- predict(PrOCoilModel, "MKQLEDKVEELLSKNYHLENEVARLKKLV", "abcdefgabcdefgabcdefgabcdefga")
+@
+
+The object \texttt{PrOCoilModel} is an object of class
+\texttt{CCModel} in which the \PrOCoil\ model is stored.
+Since \texttt{predict}
+is a generic function that determines the function to call from
+the type of the first argument, it is essential that you provide an
+object of class \texttt{CCModel} as first argument of
+\texttt{predict}. For more information about \texttt{CCModel}
+objects, enter \texttt{help(CCModel)}.
+
+The second argument is obviously the amino acid sequence and the third
+argument is the heptad annotation. The order of the two latter may be changed
+by naming arguments:
+<<PredictGCN4WildType2>>=
+GCN4wt <- predict(PrOCoilModel, reg="abcdefgabcdefgabcdefgabcdefga",
+                  seq="MKQLEDKVEELLSKNYHLENEVARLKKLV")
+@
+
+Note that the argument \texttt{seq} need not be a plain character string:
+anything that can be cast into a character string works, in particular,
+objects of class \texttt{BString} or \texttt{AAString} (see package \texttt{Biostrings}
+from Bioconductor\footnote{\url{http://www.bioconductor.org/}}).
+
+The model and the sequence are compulsory arguments. To supply a heptad register
+is compulsory too, but it can also be supplied by means of an attribute or
+\texttt{Biostrings} metadata (see \ref{sssec:reg}).
+
+As mentioned in Section\ \ref{sec:input}, the sequence and the register annotation must
+have equal lengths. The function \texttt{predict}
+creates an object of class \texttt{CCProfile} in which prediction results
+along with various additional information is stored. To obtain more information
+about this class, enter \texttt{help(CCProfile)}. Basic information about
+the result can be displayed by \texttt{show(GCN4wt)} or simply by entering
+the name of the object:
+<<DisplayResultForGCN4WildType>>=
+GCN4wt
+@
+The discriminant value and its interpretation are the same as described in
+Section\ \ref{sec:webpredict} above.
+
+A prediction profile can be plotted simply as
+follows:
+\begin{center}
+<<PlotResultForGCN4WildType,fig=TRUE,echo=TRUE,width=7.25,height=6>>=
+plot(GCN4wt)
+@
+\end{center}
+
+The \texttt{plot} function for \texttt{CCProfile} objects provides various
+ways for customizing the plot and for writing directly to graphics files
+(see also \ref{sssec:plots} and the documentation available via
+\verb+help("plot-methods")+).
+
+\subsection{Predictions for non-trimmed sequences containing coiled
+coil segments}
+
+Like the Web version described above, the \R\ package is also
+capable of handling sequences that contain non-coiled-coil
+sub-sequences. If the heptad annotation contains at least one dash
+``\texttt{-}'', \texttt{predict} first extracts all coiled coil
+segments, i.e.\ all contiguous sub-sequences with no dashes in the
+heptad annotation. Then all these coiled coil segments are analyzed
+independently and the results are returned as a list, the components
+of which are the prediction results of the coiled coil segments in
+the order they appear in the sequence. Let us consider the Marcoil
+sample sequence again:
+
+{\footnotesize
+<<PredictMarcoilExample,keep.source=TRUE>>=
+res <- predict(PrOCoilModel,
+"MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG",
+"-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------")
+@
+}
+
+\noindent The returned object \texttt{res} is a list of \texttt{CCProfile}
+objects:
+<<DisplayResultForMarcoilExample>>=
+res
+@
+Each component of the returned list is named ``$s$\_$e$'', where $s$ and $e$ are
+the start and end positions of the coiled coil segment in the original sequence.
+In the above example, therefore, `\texttt{32$\_$66}' means that the coiled coil
+segment consists of residues 32--66 in the original sequence.
+
+
+The prediction profile must be plotted for each coiled coil segment separately.
+This can be done by accessing the list components explicitly:
+\begin{center}
+<<PlotResultForMarcoilExample,fig=TRUE,echo=TRUE,width=8.75,height=6>>=
+plot(res[[1]])
+@
+\end{center}
+
+\notebox{\texttt{predict} returns a list whenever it finds at least
+one dash in the heptad annotation, regardless of whether there is
+only one or more than one coiled coil segment in the data.}
+
+\subsection{Comparative mutation analysis}
+
+The \PrOCoil\ \R\ package allows not only to consider input sequences completely
+independently of one another, but also allows for overlaying profiles of aligned coiled
+coil segments. This feature is useful, for example, for studying effects of
+different mutations. As an example, we consider a double mutation of GCN4:
+\begin{center}
+<<PredictGCN4Mutation,fig=TRUE,echo=TRUE,width=7.25,height=6>>=
+GCN4m <- predict(PrOCoilModel, "MKQLEDKVEELLSKIYHNENEVARLKKLV", "abcdefgabcdefgabcdefgabcdefga")
+GCN4m
+plot(GCN4wt, GCN4m)
+@
+\end{center}
+By default, the profile corresponding of the first argument passed to \verb+plot+ is
+plotted in red and the second argument's profile is plotted in blue. The sequence of
+the first argument is shown above the graph and the second argument's sequence is
+shown below the graph. Black letters correspond to residues that are the same in the
+two sequences, whereas mutations are highlighted in color. More information on how to
+customize plots is available in \ref{sssec:plots} and the documentation available
+via \verb+help("plot-methods")+.
+
+\notebox{profile overlays only work if the two sequences have been equally long and
+if their heptad annotations are exactly the same.}
+
+\subsection{Miscellanea}
+
+\subsubsection{Processing predicted coiled coil segments with the \R\ package}
+
+The \PrOCoil\ \R\ package itself is not able to process Marcoil or PairCoil2 output.
+Users who want to process prediction results obtained from these programs are
+recommended to use the \PrOCoil\ Web interface to convert Marcoil or
+PairCoil2 output (see Section\ \ref{sec:preproc}) into the correct input format that can be
+processed by the \PrOCoil\ \R\ package.
+
+\subsubsection{Heptad irregularities}
+
+Some coiled coils occurring in nature have heptad irregularities,
+e.g.\ incomplete heptads in which an `\verb+a+' position follows
+after a `\verb+d+' position. \PrOCoil\ can also process heptad
+annotations with such irregularities. In the profile plots created
+by the \PrOCoil\ Web interface, such irregularities can only be seen
+in the register labels in the middle of the plot. In the profile plots created by
+the \PrOCoil\ \R\ package, heptad irregularities are additionally
+visualized by a vertical red line between the two positions that do
+not conform to the usual regular pattern.
+\begin{center}
+<<PlotResultForExampleWithHeptadIrregularity,fig=TRUE,echo=TRUE,width=5.75,height=6>>=
+plot(predict(PrOCoilModel, "LQDTLVRQERPIRKSIEDLRNTV", "defgabcdefgabcdabcdefga"))
+@
+\end{center}
+
+\subsubsection{Alternative models}\label{sssec:models}
+
+Trimers occur less frequently than dimers. Correspondingly, there were
+more dimers and trimers in the data set used for training the default
+model \verb+PrOCoilModel+. Since this model was optimized for (standard)
+classification accuracy, it tends to concentrate on classifying the
+larger class --- dimers --- properly. That is why the model performs
+better in terms of specificity/true negative rate
+(correctly classified dimers) than in terms of
+sensitivity/true positive rate (correctly classified trimers). In case
+one wants to attribute equal importance to sensitivity and
+specificity, we have trained a second model that is
+optimized for {\em balanced accuracy}, i.e., the average of
+sensitivity and specificity (see publication supplement of
+\cite{MahrenholzAbfalterBodenhoferVolkmerHochreiter11}).
+This model can be used simply by calling
+\verb+predict+ with \verb+PrOCoilModelBA+ as first argument (instead of
+\verb+PrOCoilModel+ which is the standard \PrOCoil\ model). Like the
+standard model \verb+PrOCoilModel+, the alternative model
+\verb+PrOCoilModelBA+ is automatically
+available once the \PrOCoil\ \R\  has been loaded.
+
+For transparency and future safety , the \PrOCoil\ \R\ package further provides an
+open interface for loading custom classification models from a file. For this
+purpose, the function \verb+readCCModel+ is available. In order to see how
+such a model file should be organized, the two models included in the \PrOCoil\ \R\
+package are available for download at:
+
+\begin{samepage}
+\begin{quotation}
+\noindent\url{http://www.bioinf.jku.at/software/procoil/PrOCoilModel.patternmodel}\newline
+\noindent\url{http://www.bioinf.jku.at/software/procoil/PrOCoilModelBA.patternmodel}
+\end{quotation}
+\end{samepage}
+
+\noindent It is also possible to read them directly using the \texttt{readCCModel} command:
+
+{\footnotesize
+<<ReadModelFile,eval=FALSE>>=
+readCCModel("http://www.bioinf.jku.at/software/procoil/PrOCoilModel.patternmodel")
+@
+}
+
+<<ShowDefaultModel,echo=FALSE>>=
+PrOCoilModel
+@
+
+\subsubsection{Customizing and saving plots}\label{sssec:plots}
+
+The \PrOCoil\ \R\ package provides several opportunities to customize plots.
+For more detailed documentation, see \verb+help("plot-methods")+. We simply
+provide an example here that uses legends, shading, custom coloring of profiles, and
+a plot header:
+
+\begin{center}
+<<CustomPlot,fig=TRUE,echo=TRUE,width=7.25,height=6>>=
+plot(GCN4wt, GCN4m, legend.show=TRUE, xtext="wild type", ytext="mutant N16I,L19N",
+     xcol=rgb(0.7,0,0), ycol=rgb(0,0,0.8), main="GCN4 Mutation Analysis",
+     shades=c(rgb(0.77,0.85,0.95),rgb(0.99,0.84,0.71)))
+@
+\end{center}
+
+\R\ graphics have a fixed size and aspect ratio by default. That is why \PrOCoil\
+prediction profiles appear quite stretched for shorter and constricted for longer
+sequences. When exporting profile plots to graphics files, we therefore recommend
+to adjust the graphics dimensions in order to achieve a consistent and optically
+pleasing apperance:
+\begin{itemize}
+\item Use a fixed value for the {\em height} of the graphics device; we recommend
+a value between 5'' and 7'' for vector formats (PDF and (encapsulated) PostScript) and
+a few hundred pixels for bitmap image formats (BMP, JPEG, TIFF, PNG).
+\item Scale the {\em width} according to the length of the sequence; we recommend
+1/24 of the graphic's height per residue as a rule of thumb.
+\end{itemize}
+
+\noindent{\bf Examples:}
+<<PlotProfileToGraphicsFile,eval=FALSE>>=
+pdf(file="GCN4wt.pdf",height=6,width=nchar(GCN4wt@seq)*6/24)
+plot(GCN4wt)
+dev.off()
+bmp(file="GCN4wt.bmp",height=480,width=nchar(GCN4wt@seq)*480/24)
+plot(GCN4wt)
+dev.off()
+@
+
+\subsubsection{Alternative ways of supplying heptad registers to
+\texttt{predict}}\label{sssec:reg}
+
+As mentioned briefly in Subsection\ \ref{ssec:getstarted}, the \texttt{predict}
+function requires
+a string that contains the heptad register annotation of the sequence to be classified.
+Normally, this string is passed as the argument \texttt{reg}. Alternatively, one can attach the
+heptad register to the sequence object by means of the \texttt{reg} attribute:
+<<GCN4ExampleWithAttribute>>=
+GCN4wtseq<-"MKQLEDKVEELLSKNYHLENEVARLKKLV"
+attr(GCN4wtseq,"reg")<-"abcdefgabcdefgabcdefgabcdefga"
+predict(PrOCoilModel,GCN4wtseq)
+@
+The same works if a \texttt{Biostrings} object is supplied to \texttt{predict}:
+<<GCN4ExampleUsingBiostringWithAttribute>>=
+require(Biostrings)
+GCN4wtseq2<-AAString("MKQLEDKVEELLSKNYHLENEVARLKKLV")
+attr(GCN4wtseq2,"reg")<-"abcdefgabcdefgabcdefgabcdefga"
+predict(PrOCoilModel,GCN4wtseq2)
+@
+For \texttt{Biostrings} objects, the register can also be supplied by a
+component named \texttt{reg} as part of the \texttt{metadata} slot:
+<<GCN4ExampleUsingBiostringWithMetaData>>=
+GCN4wtseq3<-AAString("MKQLEDKVEELLSKNYHLENEVARLKKLV")
+GCN4wtseq3@metadata$reg<-"abcdefgabcdefgabcdefgabcdefga"
+predict(PrOCoilModel,GCN4wtseq3)
+@
+The \texttt{predict} function proceeds as follows: if the argument \texttt{reg} is present,
+it takes the content of this argument as heptad register. If the argument \texttt{reg} is
+missing, \texttt{predict} takes the \texttt{reg} attribute of the \texttt{seq} argument
+if this attribute exists. If the attribute does not exist and if \texttt{seq} is of
+class \texttt{BString} or \texttt{AAString}, then \texttt{predict} looks for a component
+named \texttt{reg} in the \texttt{metadata} slot of \texttt{seq}. If no heptad register is
+found in any of these three places, \texttt{predict} quits with an error message.
+
+\section{More Details About \PrOCoil}
+
+\subsection{How the prediction works}\label{ssec:pred}
+
+\PrOCoil's classification models are based on support vector machines
+\cite{Burges98,CortesVapnik95,MuellerMikaRaetschTsudaSchoelkopf01,SchoelkopfSmola02}
+with a kernel designed specifically for coiled coil classification:
+\[
+k(x,y)=\sum\limits_{p\in P} N(p,x)\cdot N(p,y)
+\]
+In this formula, $x$ and $y$ are the two input sequences that are to
+be compared, $P$ is a set of coiled coil-specific patterns, and $N(p,x)$
+is the number of occurrences of pattern $p$ in sequence $x$.
+
+\PrOCoil\ uses the following set of patterns $P$: pairs of amino
+acids at fixed heptad positions with no more than a maximum number
+$m$ of residues in between. Internally, these patterns are
+represented as strings with an amino acid letter on the first
+position, then a certain number of wildcards (between 0 and $m$ as
+noted above), then the second amino acid letter, and finally a
+letter `\verb+a+'--`\verb+g+' denoting the heptad register position
+of the first amino acid, e.g.\ ``\verb+N..La+''. This pattern
+matches a coiled coil sequence if the sequence has an `\verb+N+'
+(Asparagine) at an `\verb+a+' position and an `\verb+L+' (Leucine)
+at the next `\verb+d+' position.\footnote{The heptad position of the
+second amino acid is tacitly assumed to comply to the regular heptad
+repeat. If the sequence has irregularities in its heptad annotation,
+\PrOCoil\ only considers the patterns which match in both
+positions.} For instance, the GCN4 wild type has one occurrence of
+this pattern:
+\begin{quote}
+{\footnotesize\begin{verbatim}
+MKQLEDKVEELLSKNYHLENEVARLKKLV
+abcdefgabcdefgabcdefgabcdefga
+              N..L
+              a  d
+\end{verbatim}}
+\end{quote}
+
+So, obviously, \PrOCoil\ considers pair interactions of amino acids
+at given heptad positions which are no more than $m$ positions
+apart. The kernel described above resembles the spatial sample
+kernel \cite{KuksaHuangPavlovic08} (however, with a heptad-specific
+property) and the kernel described in \cite{FongKeatingSingh04}
+(however, considering interactions within one sequence and not
+restricting to a particular subset of interactions).
+
+The two models included in \PrOCoil\ further employ kernel
+normalization \cite{SchoelkopfTsudaVert04} to correct for different
+sequence lengths. This means that the support vector machines have
+been trained with the kernel
+\[
+k'(x,y)=\frac{k(x,y)}{\sqrt{k(x,x)\cdot k(y,y)}},
+\]
+where $k(.,.)$ is the {\em coiled coil kernel} described above.
+
+Using an explicit representation of the feature mapping underlying
+the kernel, the support vector machines have been transformed into
+linear classifiers on sequence features (cf.\
+\cite{BodenhoferSchwarzbauerIonescuHochreiter09} for details). Thus,
+\PrOCoil's prediction models consist of weights for specific
+sequence features (i.e.\ {\em patterns}) and a constant offset. Let
+us assume that $x$ denotes a new coiled coil sequence. Without
+kernel normalization, the discriminant function value of the new
+sequence $x$ is given as
+\[
+f(x)=b+\sum\limits_{p\in P} N(p,x)\cdot w(p),
+\]
+where $b$ is the constant offset of the support vector machine and
+$w(p)$ is the weight of pattern $p$.
+
+If kernel normalization is employed, the following, slightly more
+complicated, representation is obtained:
+\[
+f(x)=b+\left(\sum\limits_{p\in P} N(p,x)\cdot
+w(p)\right)\Big/\underbrace{\sqrt{\sum_{p\in P} N(p,x)^2}}_{=R(x)}
+\]
+Obviously, $R(x)$ is the value that corrects for the sequence
+length. The longer the sequence, the larger $R(x)$.
+
+\subsection{\PrOCoil's built-in models}\label{ssec:models}
+
+As already mentioned above, \PrOCoil\ provides a default model that
+is optimized for classification accuracy (object \verb+PrOCoilModel+
+in the \PrOCoil\ \R\ package) and an alternative model that is
+optimized for balanced accuracy (object \verb+PrOCoilModelBA+
+in the \PrOCoil\ \R\ package). Both models have been trained on the same training
+set which consisted of verified coiled coils from the PDB enriched
+by putatively similar sequences that were obtained by BLAST in
+conjunction with Marcoil. The default model was created with libSVM's C-SVM
+implementation \cite{ChangLin01} using the normalized coiled coil kernel
+with $m=7$ and a penalty parameter of $C=8$. The alternative mode
+was created with PSVM \cite{HochreiterObermayer06} using the
+normalized coiled coil kernel with $m=8$, class balancing, and regularization
+parameters $C=2$ and $\varepsilon=1.3$.
+
+In the \PrOCoil\ \R\ package, all parameters describing a model are
+stored in the corresponding \texttt{CCModel} object:
+<<DisplayModels>>=
+PrOCoilModel
+PrOCoilModel@weights["N..La"]
+PrOCoilModelBA
+PrOCoilModelBA@weights["N..La"]
+@
+In both models, the patterns in the slot \verb+weights+ are sorted decreasingly,
+i.e., from most trimeric to most dimeric. Thus, the user also has easy access
+to the most indicative patterns. Here we provide an example how to extract the
+25 most trimeric (i.e.\ the first 25 patterns in the list) and the 25 most
+dimeric patterns (i.e.\ the last 25 patterns in the list) from the \PrOCoil\ model:
+<<DisplayWeights>>=
+noP<-length(PrOCoilModel@weights)
+names(PrOCoilModel@weights)[1:25]
+names(PrOCoilModel@weights)[noP:(noP-24)]
+@
+
+\subsection{How prediction profiles are obtained}\label{ssec:profiles}
+
+Regardless of whether kernel normalization is employed or not, the
+essential component of the discriminant function is the sum
+\[
+\sum\limits_{p\in P} N(p,x)\cdot w(p).
+\]
+It is obvious that every match of a pattern $p$ contributes $w(p)$
+to the sum. In order to find out the extent to which each residue
+contributes to the final classification, we can rewrite the sum as
+\begin{equation}\label{eq:profile}
+\sum\limits_{p\in P} N(p,x)\cdot w(p)=\sum\limits_{i=1}^L c_i(x),
+\end{equation}
+where $L$ is the length of the sequence $x$ and $c_i(x)$ is the
+contribution of the $i$-th residue of $x$. The contribution $c_i(x)$
+can simply be computed as half the sum of weights of patterns
+matching the $i$-th residue.\footnote{As all patterns match two
+distinct residues, each weight must be split to the two residues in
+order to ensure that the equality \eqref{eq:profile} holds.} The
+weights $c_i(x)$ (or $c_i(x)/R(x)$ in case kernel normalization is
+employed) can be understood as a profile that can be plot over the
+sequence. We have already introduced these values as {\em prediction
+profiles} above. In order to have a unified terminology, let us
+denote the prediction profiles as
+\[
+s_i(x)=
+\begin{cases}
+c_i(x)/R(x) & \text{if kernel normalization is employed,}\\
+c_i(x) & \text{otherwise.}
+\end{cases}
+\]
+A positive values $s_i(x)$ indicates that the $i$-th residue is
+participating more strongly in patterns that are indicative for
+trimers. A negative values $s_i(x)$ indicates that the $i$-th
+residue is participating more strongly in patterns that are
+indicative for dimers. A value $s_i(x)$ or zero or close to zero
+either means that the $i$-th residue is not participating in any
+indicative patterns or that it participates in dimer and trimer
+patterns the contributions of which compensate/cancel each other.
+
+\PrOCoil\ computes prediction profiles each time it computes a
+prediction. It is clear that we can recover the discriminant value
+$f(x)$ as follows:
+\[
+f(x)=b+\sum\limits_{i=1}^L s_i(x)
+\]
+If $b\not=0$, which is the normal case, the values $s_i(x)$ do not
+provide enough information to infer the final classification from
+the prediction profile. In order to facilitate a more sensible
+analysis, let us reformulate the above equality as
+\[
+f(x)=\sum\limits_{i=1}^L
+\big(s_i(x)+\frac{b}{L}\big)=\sum\limits_{i=1}^L
+\big(s_i(x)-(-\frac{b}{L})\big).
+\]
+Hence, if we plot the profile values $s_i(x)$ along with a
+horizontal line at $-\frac{b}{L}$, we can recover the discriminant
+value $f(x)$ as the difference of the area above the $-\frac{b}{L}$
+minus the area below $-\frac{b}{L}$. The value $-\frac{b}{L}$
+exactly corresponds to the ``base line'' mentioned above.
+
+\section{How to Cite PrOCoil}
+
+If you use PrOCoil for research that is published later, you are kindly
+asked to cite it as follows:
+\begin{quotation}
+\noindent C.\ C. Mahrenholz, I.\ G. Abfalter, U.\ Bodenhofer, R.\ Volkmer, and S.\ Hochreiter.
+\newblock Complex networks govern coiled coil oligomerization --- predicting
+  and profiling by means of a machine learning approach.
+\newblock {\em Mol. Cell. Proteomics}, 2011.
+\newblock (in press). DOI:\ \href{http://dx.doi.org/10.1074/mcp.M110.004994}{10.1074/mcp.M110.004994}
+\end{quotation}
+
+\noindent To obtain Bib\TeX\ entries of the two references, you can enter the following
+into your R session:
+<<DisplayBibTeXReference,eval=FALSE>>=
+toBibtex(citation("procoil"))
+@
+
+%\bibliographystyle{plain}
+%\bibliography{Bioinformatics,MachineLearningClassical,BodenhoferPub}
+
+\begin{thebibliography}{10}
+
+\bibitem{BergerWilsonWolfTonchevMillaKim95}
+B.\ Berger, D.\ B. Wilson, E.\ Wolf, T.\ Tonchev, M.\ Milla, and P.\ S. Kim.
+\newblock Predicting coiled coils by use of pairwise residue correlations.
+\newblock {\em Proc. Natl. Acad. Sci. USA}, 92:8259--8263, 1995.
+
+\bibitem{BodenhoferSchwarzbauerIonescuHochreiter09}
+U.\ Bodenhofer, K.\ Schwarzbauer, M.\ Ionescu, and S.\ Hochreiter.
+\newblock Modeling position specificity in sequence kernels by fuzzy
+  equivalence relations.
+\newblock In J.\ P. Carvalho, D.\ Dubois, U.\ Kaymak, and J.\ M.\ C. Sousa, editors,
+  {\em Proc. Joint 13th IFSA World Congress and 6th EUSFLAT Conference}, pages
+  1376--1381, Lisbon, July 2009.
+
+\bibitem{Burges98}
+C.\ J.\ M. Burges.
+\newblock A tutorial on support vector machines for pattern recognition.
+\newblock {\em Data Min. Knowl. Discov.}, 2:121--167, 1998.
+
+\bibitem{ChangLin01}
+C.-C. Chang and C.-J. Lin.
+\newblock {\em {LIBSVM}: a library for support vector machines}, 2001.
+\newblock Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}.
+
+\bibitem{CortesVapnik95}
+C.\ Cortes and V.\ N. Vapnik.
+\newblock Support vector networks.
+\newblock {\em Machine Learning}, 20:273--297, 1986.
+
+\bibitem{DelorenziSpeed02}
+M.\ Delorenzi and T.\ Speed.
+\newblock An {HMM} model for coiled-coil domains and a comparison with
+  {PSSM}-based predictions.
+\newblock {\em Bioinformatics}, 18(4):617--625, 2002.
+
+\bibitem{FongKeatingSingh04}
+J.\ H. Fong, A.\ E. Keating, and M.\ Singh.
+\newblock Predicting specificity in {bZIP} coiled-coil protein interactions.
+\newblock {\em Genome Biol.}, 5:R11, 2004.
+
+\bibitem{HochreiterObermayer06}
+S.\ Hochreiter and K.\ Obermayer.
+\newblock Support vector machines for dyadic data.
+\newblock {\em Neural Comput.}, 18:1472--1510, 2006.
+
+\bibitem{KuksaHuangPavlovic08}
+P.\ Kuksa, P.-H. Huang, and V.\ Pavlovic.
+\newblock A fast, large-scale learning method for protein sequence
+  classification.
+\newblock In {\em 8th Int. Workshop on Data Mining in Bioinformatics}, pages
+  29--37, Las Vegas, NV, 2008.
+
+\bibitem{MahrenholzAbfalterBodenhoferVolkmerHochreiter11}
+C.\ C. Mahrenholz, I.\ G. Abfalter, U.\ Bodenhofer, R.\ Volkmer, and S.\ Hochreiter.
+\newblock Complex networks govern coiled coil oligomerization --- predicting
+  and profiling by means of a machine learning approach.
+\newblock {\em Mol. Cell. Proteomics}, 2011.
+\newblock (in press).
+
+\bibitem{McDonnellJiangKeatingBerger06}
+A.\ V. McDonnell, T.\ Jiang, A.\ E. Keating, and B.\ Berger.
+\newblock Paircoil2: improved prediction of coiled coils from sequence.
+\newblock {\em Bioinformatics}, 22(3):356--358, 2006.
+
+\bibitem{MuellerMikaRaetschTsudaSchoelkopf01}
+K.-R. M\"uller, S.\ Mika, G.\ R\"atsch, K.\ Tsuda, and B.\ Sch\"olkopf.
+\newblock An introduction to kernel-based learning algorithms.
+\newblock {\em IEEE Trans. Neural Networks}, 12(2):181--201, 2001.
+
+\bibitem{SchoelkopfSmola02}
+B.\ Sch\"olkopf and A.\ J. Smola.
+\newblock {\em Learning with Kernels}.
+\newblock Adaptive Computation and Machine Learning. MIT Press, Cambridge, MA,
+  2002.
+
+\bibitem{SchoelkopfTsudaVert04}
+B.\ Sch\"olkopf, K.\ Tsuda, and J.-P. Vert, editors.
+\newblock {\em Kernel Methods in Computational Biology}.
+\newblock MIT Press, Cambridge, MA, 2004.
+
+\bibitem{WalshawWoolfson01}
+J.\ Walshaw and D.\ N. Woolfson.
+\newblock {SOCKET:} a program for identifying and analysing coiled-coil motifs
+  within protein structures.
+\newblock {\em J. Mol. Biol.}, 307(5):1427--1450, 2001.
+
+\end{thebibliography}
+
+
+\end{document}

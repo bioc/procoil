@@ -1,0 +1,14 @@
+importFrom("stats",
+	   "predict",
+           "weights",
+           "profile")
+
+importFrom("methods")
+
+importFrom("graphics",
+           "plot")
+
+export("readCCModel")
+
+exportClasses("CCModel", "CCProfile")
+exportMethods("predict", "show", "plot", "weights", "profile")

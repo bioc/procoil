@@ -1,0 +1,31 @@
+citHeader("To cite package 'procoil' in publications use:")
+
+desc <- packageDescription("procoil")
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", desc$Date)
+vers <- paste("R package version", desc$Version)
+url  <- desc$URL
+
+citEntry(entry="Article",
+         title=paste("Complex networks govern coiled coil oligomerization",
+                     "--- predicting and profiling by means of a machine",
+                     "learning approach"),
+         author=personList(as.person("Carsten C. Mahrenholz"),
+                           as.person("Ingrid G. Abfalter"),
+                           as.person("Ulrich Bodenhofer"),
+                           as.person("Rudolf Volkmer"),
+                           as.person("Sepp Hochreiter")),
+         journal="Mol. Cell. Proteomics",
+         year="2011",
+         doi="10.1074/mcp.M110.004994",
+         note="(in press)",
+         textVersion =
+             paste("Carsten C. Mahrenholz, Ingrid G. Abfalter,",
+                   "Ulrich Bodenhofer, Rudolf Volkmer, and",
+                   "Sepp Hochreiter (2011).",
+                   "Complex networks govern coiled coil oligomerization",
+                   "- predicting and profiling by means of a machine",
+                   "learning approach. Mol. Cell. Proteomics (in press).",
+                   "DOI: 10.1074/mcp.M110.004994"))
+
+citFooter("To obtain the references in BibTeX format, enter",
+          "'toBibtex(citation(\"procoil\"))'")
