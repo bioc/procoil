@@ -760,19 +760,19 @@ In the \PrOCoil\ \R\ package, all parameters describing a model are
 stored in the corresponding \texttt{CCModel} object:
 <<DisplayModels>>=
 PrOCoilModel
-PrOCoilModel@weights["N..La"]
+weights(PrOCoilModel)["N..La"]
 PrOCoilModelBA
-PrOCoilModelBA@weights["N..La"]
+weights(PrOCoilModelBA)["N..La"]
 @
-In both models, the patterns in the slot \verb+weights+ are sorted decreasingly,
+In both models, the pattern weights  are sorted decreasingly,
 i.e., from most trimeric to most dimeric. Thus, the user also has easy access
 to the most indicative patterns. Here we provide an example how to extract the
 25 most trimeric (i.e.\ the first 25 patterns in the list) and the 25 most
 dimeric patterns (i.e.\ the last 25 patterns in the list) from the \PrOCoil\ model:
 <<DisplayWeights>>=
-noP<-length(PrOCoilModel@weights)
-names(PrOCoilModel@weights)[1:25]
-names(PrOCoilModel@weights)[noP:(noP-24)]
+noP<-length(weights(PrOCoilModel))
+names(weights(PrOCoilModel))[1:25]
+names(weights(PrOCoilModel))[noP:(noP-24)]
 @
 
 \subsection{How prediction profiles are obtained}\label{ssec:profiles}

@@ -17,8 +17,8 @@ visualized graphically using a plot function.
 \tabular{ll}{
 Package: \tab procoil\cr
 Type: \tab Package\cr
-Version: \tab 0.99.1\cr
-Date: \tab 2011-03-07\cr
+Version: \tab 1.1.0\cr
+Date: \tab 2011-03-14\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 }

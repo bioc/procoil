@@ -1,27 +1,33 @@
 setMethod("predict", signature(object="CCModel"),
     function(object, seq, reg)
     {
-        if (missing(seq) || !nchar(as.character(seq)))
-            stop("sequence missing or empty\n")
+        if (missing(seq))
+            stop("sequence missing\n")
 
         if (missing(reg))
         {
             if (!is.null(attr(seq, "reg")))
                 reg <- as.character(attr(seq, "reg"))
-            else if ((class(seq) == "AAString" ||
-                     class(seq) == "BString") &&
-                     !is.null(seq@metadata$reg))
-            {
-                reg <- as.character(seq@metadata$reg)
-            }
             else
                 reg <- ""
         }
 
+        if (class(seq) == "AAString" || class(seq) == "BString")
+        {
+            if (!require(Biostrings))
+                stop("could not load package `Biostrings'\n")
+
+            if (!nchar(reg) && !is.null(seq@metadata$reg))
+                reg <- as.character(seq@metadata$reg)
+
+            seq <- as.character(seq)
+        }
+
+        if (!nchar(seq))
+            stop("sequence empty\n")
+
         if (!nchar(reg))
             stop("register missing or empty\n")
-
-        seq <- as.character(seq)
 
         if (nchar(seq) != nchar(reg))
             stop("lengths of sequence and register do not match\n")
@@ -66,13 +72,13 @@ setMethod("predict", signature(object="CCModel"),
 
             for (l in 0:object@m)
             {
-                for (i in 1:(n - l - 1))
+                for (i in seq(from=1, length=max(0, n - l - 1)))
                 {
                     firstreg <- substr(reg, i, i)
                     lastreg <- substr(reg, i + l + 1, i + l + 1)
 
                     if (lastreg ==
-                        regnames[(regarray[firstreg] + l + 1) %% 7 +1])
+                        regnames[(regarray[firstreg] + l + 1) %% 7 + 1])
                     {
                         pattern <- paste(substr(seq, i, i), dotfill,
                                          substr(seq, i + l + 1, i + l + 1),
