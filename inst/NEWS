@@ -3,7 +3,7 @@
      versions published on the author's institute page
    - minor improvements of vignette (accessor functions)
    - fixed bug (error when calling predict() on a BString/AAString
-     without previously loading Biostrings)
+     object without previously loading Biostrings)
    - fixed bug in predict() for short sequences
 
 0.99.1:
