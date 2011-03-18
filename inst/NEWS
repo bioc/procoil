@@ -1,3 +1,6 @@
+1.1.1:
+   - simplified interface of plot()
+
 1.1.0:
    - changed version number to 1.1.0 for consistency with previous
      versions published on the author's institute page

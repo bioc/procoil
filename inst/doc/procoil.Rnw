@@ -596,8 +596,8 @@ a plot header:
 
 \begin{center}
 <<CustomPlot,fig=TRUE,echo=TRUE,width=7.25,height=6>>=
-plot(GCN4wt, GCN4m, legend.show=TRUE, xtext="wild type", ytext="mutant N16I,L19N",
-     xcol=rgb(0.7,0,0), ycol=rgb(0,0,0.8), main="GCN4 Mutation Analysis",
+plot(GCN4wt, GCN4m, legend=c("wild type", "mutant N16I,L19N"),
+     col=c(rgb(0.7,0,0), rgb(0,0,0.8)), main="GCN4 Mutation Analysis",
      shades=c(rgb(0.77,0.85,0.95),rgb(0.99,0.84,0.71)))
 @
 \end{center}
