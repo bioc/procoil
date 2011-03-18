@@ -29,10 +29,18 @@ Linz\\Altenberger Str. 69, 4040 Linz, Austria\\
 options(width=65)
 set.seed(0)
 library(procoil)
-procoilver<-packageDescription("procoil")$Version
+procoilVersion <- packageDescription("procoil")$Version
+procoilDateRaw <- packageDescription("procoil")$Date
+procoilDateYear <- as.numeric(substr(procoilDateRaw, 1, 4))
+procoilDateMonth <- as.numeric(substr(procoilDateRaw, 6, 7))
+procoilDateDay <- as.numeric(substr(procoilDateRaw, 9, 10))
+procoilDate <- paste(month.name[procoilDateMonth], " ",
+                     procoilDateDay, ", ",
+                     procoilDateYear, sep="")
 @
-\newcommand{\PrOCoilVer}{\Sexpr{procoilver}}
-\manualtitlepage[Version \PrOCoilVer, \today]
+\newcommand{\PrOCoilVer}{\Sexpr{procoilVersion}}
+\newcommand{\PrOCoilDate}{\Sexpr{procoilDate}}
+\manualtitlepage[Version \PrOCoilVer, \PrOCoilDate]
 
 \section*{Scope and Purpose of this Document}
 
