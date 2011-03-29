@@ -2,8 +2,8 @@ Package: procoil
 Type: Package
 Title: Prediction of Oligomerization of Coiled Coil Proteins
 Version: 1.1.1
-Date: 2011-03-18
-Depends: R (>= 2.13.0), methods
+Date: 2011-03-29
+Depends: R (>= 2.10.1), methods
 Imports: methods, stats, graphics, utils
 Suggests: Biostrings
 Author: Ulrich Bodenhofer
