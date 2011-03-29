@@ -21,7 +21,7 @@ from files using the function \code{\link{readCCModel}}.
      Given a new coiled coil sequence \eqn{x} and a model,
      the discriminant function of the model is given as 
 
-     \deqn{f(x)=b+\sum_{p\in P} N(p,x) w(p),}{%
+     \deqn{f(x)=b+\sum_{p\in P} N(p,x)\cdot w(p),}{%
            f(x)=b+sum over all p in P of (N(p,x) w(p)),}
 
      where \eqn{b} is a constant,  \eqn{N(p,x)} denotes the number of
@@ -35,14 +35,14 @@ from files using the function \code{\link{readCCModel}}.
      is employed, the weights are computed in a different way and the
      discriminant function changes to
 
-     \deqn{f(x)=b+\frac{\sum_{p\in P} N(p,x) w(p)}{R(x)},}{%
+     \deqn{f(x)=b+\frac{\sum_{p\in P} N(p,x)\cdot w(p)}{R(x)},}{%
            f(x)=b+(sum over all p in P of (N(p,x) w(p)))/R(x),}
 
      where \eqn{R(x)} is a normalization value depending on the
      sample \eqn{x}. It is defined as follows:
 
-     \deqn{R(x)=\sum_{p\in P} N(p,x)^2}{%
-           R(x)=b+sum over all p in P of N(p,x)^2}
+     \deqn{R(x)=\sqrt{\sum_{p\in P} N(p,x)^2}}{%
+           R(x)=sqrt(sum over all p in P of N(p,x)^2)}
 
      The \pkg{procoil} package does not consider arbitrary
      patterns, but only very specific ones: pairs of amino acids at

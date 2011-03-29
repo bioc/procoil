@@ -62,10 +62,10 @@ sequence, every amino acid in the sequence contributes a unique weight
 to the discriminant function value which is nothing else but half the
 sum of weights of matching patterns in which this amino acid is
 involved. If we denote the contribution of each position \eqn{i} with
-\eqn{s_i}{si}, it follows immediately that
+\eqn{s_i(x)}{si(x)}, it follows immediately that
 
-\deqn{f(x)=b+\sum\limits_{i=1}{L} s_i,}{%
-      f(x)=b+sum over all si for i=1,\dots L,}
+\deqn{f(x)=b+\sum\limits_{i=1}^{L} s_i(x),}{%
+      f(x)=b+sum over all si(x) for i=1,\dots L,}
 
 where \eqn{L} is the length of the sequence \eqn{x}.
 }

@@ -70,23 +70,20 @@
   respectively. The value \eqn{-b/L} and the light gray line has the 
   following meaning: It is obvious that we can rewrite
 
-  \deqn{f(x)=b+\sum\limits_{i=1}{L} s_i}{%
-      f(x)=b+sum over all si for i=1,\dots L}
+  \deqn{f(x)=b+\sum\limits_{i=1}^{L} s_i(x)}{%
+      f(x)=b+sum over all si(x) for i=1,\dots L}
 
   as
 
-  \deqn{f(x)=\sum\limits_{i=1}{L} (s_i - (-\frac{b}{L}))}{%
-      f(x)=sum over all (si - (-b/L)) for i=1,\dots L,}
+  \deqn{f(x)=\sum\limits_{i=1}^{L} (s_i(x) - (-\frac{b}{L}))}{%
+      f(x)=sum over all (si(x) - (-b/L)) for i=1,\dots L,}
 
   so the discriminant function value \eqn{f(x)} can be understood
-  as the sum of values \eqn{s_i - (-\frac{b}{L})}{(si - (-b/L))}, i.e.
+  as the sum of values \eqn{s_i(x) - (-\frac{b}{L})}{(si(x) - (-b/L))}, i.e.
   the area between the constant value  \eqn{-b/L} and the prediction
   profile. If the area above the light gray line is greater than
   the area below the light gray line, the sequence is predicted as
-  trimer, otherwise as dimer. Note that this correspondence only
-  holds for predictions based on the raw discriminant value. If
-  probability estimates are used for the final classification, this
-  may not be fully true.
+  trimer, otherwise as dimer.
 
   If \code{plot} is called with two \code{\linkS4class{CCProfile}}
   arguments, the two profiles are plotted together to facilitate
