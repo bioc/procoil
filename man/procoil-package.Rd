@@ -14,14 +14,6 @@ are indicative for either class. Profiles can also be
 visualized graphically using a plot function.
 }
 \details{
-\tabular{ll}{
-Package: \tab procoil\cr
-Type: \tab Package\cr
-Version: \tab 1.1.2\cr
-Date: \tab 2001-03-30\cr
-License: \tab GPL (>= 2)\cr
-LazyLoad: \tab yes\cr
-}
 The package defines two S4 classes, \code{\linkS4class{CCModel}} and
 \code{\linkS4class{CCProfile}}. The former's purpose to represent
 a coiled coil prediction model. The default model
