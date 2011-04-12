@@ -852,12 +852,12 @@ asked to cite it as follows:
 \noindent C.\ C. Mahrenholz, I.\ G. Abfalter, U.\ Bodenhofer, R.\ Volkmer, and S.\ Hochreiter.
 \newblock Complex networks govern coiled coil oligomerization --- predicting
   and profiling by means of a machine learning approach.
-\newblock {\em Mol. Cell. Proteomics}, 2011.
-\newblock (in press). DOI:\ \href{http://dx.doi.org/10.1074/mcp.M110.004994}{10.1074/mcp.M110.004994}
+\newblock {\em Mol. Cell. Proteomics} 10(5), 2011.
+\newblock DOI:\ \href{http://dx.doi.org/10.1074/mcp.M110.004994}{10.1074/mcp.M110.004994}
 \end{quotation}
 
-\noindent To obtain Bib\TeX\ entries of the two references, you can enter the following
-into your R session:
+\noindent To obtain this reference in Bib\TeX\ format, you can enter the
+following into your R session:
 <<DisplayBibTeXReference,eval=FALSE>>=
 toBibtex(citation("procoil"))
 @
@@ -922,8 +922,7 @@ P.\ Kuksa, P.-H. Huang, and V.\ Pavlovic.
 C.\ C. Mahrenholz, I.\ G. Abfalter, U.\ Bodenhofer, R.\ Volkmer, and S.\ Hochreiter.
 \newblock Complex networks govern coiled coil oligomerization --- predicting
   and profiling by means of a machine learning approach.
-\newblock {\em Mol. Cell. Proteomics}, 2011.
-\newblock (in press).
+\newblock {\em Mol. Cell. Proteomics} 10(5), 2011.
 
 \bibitem{McDonnellJiangKeatingBerger06}
 A.\ V. McDonnell, T.\ Jiang, A.\ E. Keating, and B.\ Berger.
