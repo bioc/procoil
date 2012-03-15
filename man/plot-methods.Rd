@@ -12,7 +12,7 @@
 \usage{
 \S4method{plot}{CCProfile,missing}(x, col="red", rng=0,
              standardize=FALSE, shades=NULL,
-             legend="", legend.pos="topright", ...)
+             legend="", legend.pos="topright", xlab="", ylab="weight", ...)
 \S4method{plot}{CCProfile,CCProfile}(x, y, col=c("red", "blue"), rng=0,
              standardize=FALSE, shades=NULL, legend=NULL,
              legend.pos="topright", ...)
@@ -58,6 +58,8 @@
 		    coordinates or a single keyword like
 		    \dQuote{topright} (see
 		    \code{\link[graphics:legend]{legend}}).}
+  \item{xlab}{Label of horizontal axis, empty by default.}
+  \item{ylab}{Label of vertical axis, defaults to \dQuote{weight}.}
   \item{...}{all other arguments are passed to the standard
              \code{\link[graphics:plot]{plot}} command that is called
              internally to display the graphics window}

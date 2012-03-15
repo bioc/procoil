@@ -85,13 +85,9 @@ setMethod("predict", signature(object="CCModel"),
                                          firstreg, sep="")
 
                         if (setequal(features[[pattern]], NULL))
-                        {
                             features[[pattern]] <- 1
-                        }
                         else
-                        {
                             features[[pattern]] <- features[[pattern]] + 1
-                        }
 
                         if (!setequal(object@weights[[pattern]], NULL))
                         {
@@ -108,10 +104,8 @@ setMethod("predict", signature(object="CCModel"),
             scal <- 1
 
             if (object@scaling)
-            {
                 scal <- sqrt(sum(unlist(lapply(features,
-                                               function(x){x^2}))))
-            }
+                                               function(x) x^2))))
 
             output@profile <- prfl / scal
             output@disc <- sum(output@profile) + output@b

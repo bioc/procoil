@@ -1,6 +1,6 @@
 setMethod("plot", signature(x="CCProfile", y="missing"),
     function(x, col="red", rng=0, standardize=FALSE, shades=NULL,
-             legend="", legend.pos="topright", ...)
+             legend="", legend.pos="topright", xlab="", ylab="weight", ...)
     {
         if (!is.numeric(try(col2rgb(col), silent=TRUE)[1]))
             stop("argument `col' must be a string denoting a color\n")
@@ -27,7 +27,7 @@ setMethod("plot", signature(x="CCProfile", y="missing"),
         if (rng <= 0) rng <- max(abs(c(prfl, hlin)))
 
         plot(x=NULL,y=NULL, xlim=c(1, n + 1), ylim=c(-rng, rng),
-             axes=FALSE, xlab="", ylab="weight", type="s", ...)
+             axes=FALSE, xlab=xlab, ylab=ylab, type="s", ...)
 
         if (!is.null(shades))
         {
@@ -40,9 +40,7 @@ setMethod("plot", signature(x="CCProfile", y="missing"),
                         col=shades[2], border=NA)
             }
             else
-            {
                 stop("shades must be a vector of 2 colors\n")
-            }
         }
 
         sapply(gregexpr("a", x@reg)[[1]],
@@ -107,17 +105,11 @@ setMethod("plot", signature(x="CCProfile", y="CCProfile"),
         b <- x@b
 
         if (nchar(y@seq) != n || nchar(x@reg) != n)
-        {
             stop("length mismatch\n")
-        }
         else if (y@reg != x@reg)
-        {
             stop("register mismatch\n")
-        }
         else if (y@b != b)
-        {
             stop("offset mismatch\n")
-        }
 
         minvalue <- min(c(x@profile, y@profile))
         maxvalue <- max(c(x@profile, y@profile))
@@ -132,9 +124,7 @@ setMethod("plot", signature(x="CCProfile", y="CCProfile"),
                 hlin <- 0
             }
             else
-            {
                 rng <- max(abs(c(hlin, minvalue, maxvalue)))
-            }
         }
 
         plot(x=NULL,y=NULL, xlim=c(1, n + 1), ylim=c(-rng, rng),
@@ -151,9 +141,7 @@ setMethod("plot", signature(x="CCProfile", y="CCProfile"),
                         col=shades[2], border=NA)
             }
             else
-            {
                 stop("shades must be a vector of 2 colors\n")
-            }
         }
 
         sapply(gregexpr("a", x@reg)[[1]],
