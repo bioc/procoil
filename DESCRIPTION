@@ -1,7 +1,7 @@
 Package: procoil
 Type: Package
 Title: Prediction of Oligomerization of Coiled Coil Proteins
-Version: 1.5.2
+Version: 1.6.0
 Date: 2012-03-26
 Depends: R (>= 2.10.1), methods
 Imports: methods, stats, graphics, utils
