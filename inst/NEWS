@@ -1,19 +1,32 @@
-1.5.1:
-   - made arguments xlab and ylab accessible to users
+Change history of package procoil:
+==================================
 
-1.1.1:
-   - simplified interface of plot()
+The following list highlights the change history of the package.
+It only mentions versions in which actual changes have been made
+(leaving out automatic version number increments that have been made
+within the Bioconductor release cycle without any actual change
+of code or documentation).
 
-1.1.0:
-   - changed version number to 1.1.0 for consistency with previous
-     versions published on the author's institute page
-   - minor improvements of vignette (accessor functions)
-   - fixed bug (error when calling predict() on a BString/AAString
-     object without previously loading Biostrings)
-   - fixed bug in predict() for short sequences
+Version 1.13.0:
+- cleared up package dependencies
+- minor corrections to vignette
 
-0.99.1:
-   - minor changes to the code chunks in the vignette
+Version 1.5.1:
+- made arguments xlab and ylab accessible to users
 
-0.99.0:
-   - first version submitted to Bioconductor
+Version 1.1.1:
+- simplified interface of plot()
+
+Version 1.1.0:
+- changed version number to 1.1.0 for consistency with previous
+  versions published on the author's institute page
+- minor improvements of vignette (accessor functions)
+- fixed bug (error when calling predict() on a BString/AAString
+  object without previously loading Biostrings)
+- fixed bug in predict() for short sequences
+
+Version 0.99.1:
+- minor changes to the code chunks in the vignette
+
+Version 0.99.0:
+- first version submitted to Bioconductor
