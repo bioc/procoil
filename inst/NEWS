@@ -7,7 +7,7 @@ It only mentions versions in which actual changes have been made
 within the Bioconductor release cycle without any actual change
 of code or documentation).
 
-Version 1.13.0:
+Version 1.13.1:
 - cleared up package dependencies
 - minor corrections to vignette
 
