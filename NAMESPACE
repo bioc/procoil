@@ -1,9 +1,9 @@
+import("methods")
+
 importFrom("stats",
 	   "predict",
            "weights",
            "profile")
-
-importFrom("methods")
 
 importFrom("graphics",
            "plot")
