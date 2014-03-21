@@ -7,8 +7,9 @@ It only mentions versions in which actual changes have been made
 within the Bioconductor release cycle without any actual change
 of code or documentation).
 
-Version 1.13.1:
-- cleared up package dependencies
+Version 1.13.2:
+- cleared up package dependencies and namespace
+- reference to Bioconductor Git-SVN bridge
 - minor corrections to vignette
 
 Version 1.5.1:

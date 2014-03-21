@@ -1,8 +1,8 @@
 Package: procoil
 Type: Package
 Title: Prediction of Oligomerization of Coiled Coil Proteins
-Version: 1.13.1
-Date: 2014-03-17
+Version: 1.13.2
+Date: 2014-03-21
 Depends: R (>= 2.12.0)
 Imports: methods, stats, graphics
 Suggests: Biostrings
@@ -20,7 +20,7 @@ License: GPL (>= 2)
 Collate: AllClasses.R show-methods.R plot-methods.R predict-methods.R
 	 weights-methods.R profile-methods.R readCCModel.R
 URL: http://www.bioinf.jku.at/software/procoil/
+     https://github.com/UBod/procoil
 LazyLoad: yes
 LazyData: yes
 biocViews: Proteomics, Classification
-
