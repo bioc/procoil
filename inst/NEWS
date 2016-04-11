@@ -7,13 +7,35 @@ It only mentions versions in which actual changes have been made
 within the Bioconductor release cycle without any actual change
 of code or documentation).
 
+Version 2.0.0:
+- updated models PrOCoilModel and PrOCoilModelBA that
+  have been trained with newer data and up-to-date methods
+- general re-design of classes and functions to allow for
+  multiple predictions per run; that comes along with
+  a more streamlined and more versatile interface how to
+  supply sequences and registers to predict().
+- predictions and plots are now performed by the 'kebabs'
+  package; this led to a major performance increase.
+- the integration of the 'kebabs' package also allowed
+  for inheriting functions like heatmap() and accessors,
+  such as, sequences(), baselines(), and profiles()
+- added a fitted() method to allow for easy extraction of
+  predictions
+- addition of small example model file
+  inst/examples/testModel.CCModel
+- streamlining/simplification of some man pages
+- several corrections and updates of man pages and
+  package vignette
+- changed vignette building engine from Sweave to knitr
+- removal of reference to Git-SVN bridge
+
 Version 1.13.2:
 - cleared up package dependencies and namespace
 - reference to Bioconductor Git-SVN bridge
 - minor corrections to vignette
 
 Version 1.5.1:
-- made arguments xlab and ylab accessible to users
+- made arguments 'xlab' and 'ylab' accessible to users
 
 Version 1.1.1:
 - simplified interface of plot()

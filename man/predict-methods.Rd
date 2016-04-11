@@ -6,38 +6,30 @@
 \alias{predict.CCModel}
 \title{Predict oligomerization of coiled coil segment}
 \description{
-  Function for predicting the oligomerization of a coiled coil segment
+  Function for predicting the oligomerization of one or multiple coiled
+  coil segments
 }
 \usage{
 \S4method{predict}{CCModel}(object, seq, reg)
 }
 \arguments{
   \item{object}{The model to be considered; can either be one of the 
-                models included in the package (\code{\link{PrOCoilModel}}
-                and \code{\link{PrOCoilModelBA}})
-                or any other model loaded or created by the user.
-                For a detailed explanation of the two default models,
-                see\code{\linkS4class{CCModel}}.}
-  \item{seq}{An amino acid sequence; valid
-             characters are all uppercase letters except \sQuote{B},
-             \sQuote{J}, \sQuote{O}, \sQuote{U}, \sQuote{X}, and
-             \sQuote{Z}; invalid characters are tolerated, but ignored
-             by prediction. This argument can be of any type that can
-             be cast to a character string, including Biostrings objects.}
-  \item{reg}{A character string denoting the heptad register;
-             valid characters are the lowercase letters \sQuote{a} to
-             \sQuote{g}. All characters must be in proper order, e.g.
-             \sQuote{a} can only be followed by \sQuote{b},
-             \sQuote{b} can only be followed by \sQuote{c}, \dots,
-             \sQuote{g} can only be followed by \sQuote{a}. The
-             register can start with any of the seven letters.
-             It must always have the same length as the \code{seq}
-             argument. If this argument is missing, \code{predict}
-             looks whether the object passed as argument \code{seq}
-             has an attribute \code{reg}. If this attribute is missing
-             and if \code{seq} is of class \code{BString} or
-             \code{AAString}, \code{predict} looks whether there is a
-             \code{reg} component in the \code{metadata} slot of \code{seq}.}
+    models included in the package (\code{\link{PrOCoilModel}}
+    and \code{\link{PrOCoilModelBA}}) or any other model loaded or
+    created by the user. For a detailed explanation of the two default models,
+    see\code{\linkS4class{CCModel}}.}
+  \item{seq}{One or several amino acid sequences; valid
+    characters are all uppercase letters except \sQuote{B},
+    \sQuote{J}, \sQuote{O}, \sQuote{U}, \sQuote{X}, and
+    \sQuote{Z}; invalid characters are tolerated, but ignored
+    by prediction. This argument can be a character vector,
+    an \code{\linkS4class{AAString}} object, an
+    \code{\linkS4class{AAStringSet}} object, or an
+    \code{\linkS4class{AAVector}} object}
+  \item{reg}{a character vector containing the heptad register(s);
+    valid characters are the lowercase letters \sQuote{a} to
+    \sQuote{g} and dashes \sQuote{-}. Can also be omitted, see details
+    below.}
 }
 \details{
   The function \code{predict} is the most important one in the
@@ -47,49 +39,82 @@
   By default the final classification is computed on the basis of
   the discriminant function value. If \eqn{f(x)>=0}, \eqn{x} is
   predicted as trimer, otherwise as dimer.
+
+  If the \code{reg} argument is missing, \code{predict}
+  looks whether the object passed as argument \code{seq}
+  includes heptad register information, either as an attribute
+  \code{"reg"} (if \code{seq} is a character vector), as
+  metadata field \code{"reg"} (if \code{seq} is an
+  \code{\linkS4class{AAString}} or \code{\linkS4class{AAStringSet}}
+  object), or via annotation metadata (if \code{seq} is
+  an \code{\linkS4class{AAStringSet}} or \code{\linkS4class{AAVector}}
+  object; see \code{\link{annotationMetadata}}).
+  In any case, the \code{reg} argument has priority over all other
+  ways of specifying the heptad annotation. In other words,
+  if \code{reg} is specified and \code{seq} contains heptad
+  annotations in one of the ways described above, the
+  \code{reg} argument has priority and the heptad annotation in
+  \code{seq} is ignored.
+  
+  The \code{reg} argument must have exactly as many elements
+  as \code{seq} has sequences, and the registers must be
+  aligned to the sequences, i.e. the first register must be
+  exactly as long as the first sequence, and so on.
+
+  If heptad registers contain dashes, the \code{predict}
+  function extracts all contiguous coiled coil segments and computes
+  predictions for all of them. The returned
+  \code{\linkS4class{CCProfile}} object then contains
+  profiles/predictions of all coiled coil segments that were
+  extracted from \code{seq} (see example below).
 }
-\value{
-  If the heptad register (supplied by argument \code{reg} or
-  by one of the way described above) does not contain any dashes \sQuote{-},
-  \code{predict} returns a \code{\linkS4class{CCProfile}} object
-  containing the classification result and the prediction profile.
-  If the heptad register contains dashes \sQuote{-}, \code{predict}
-  returns a list of \code{\linkS4class{CCProfile}} objects, each
-  corresponding to the prediction profile of one of the
-  coiled coil segments contained in the sequence. The names of the
-  components are of the format \dQuote{s_e}, where \sQuote{s} denotes the
-  start position and \sQuote{e} denotes the end position of the
-  respective coiled coil sequence in the original sequence.
-  \code{show} returns an invisible \code{NULL}
-}
+\value{  returns a \code{\linkS4class{CCProfile}} object}
 \references{\url{http://www.bioinf.jku.at/software/procoil/}
 
   Mahrenholz, C.C., Abfalter, I.G., Bodenhofer, U., Volkmer, R., and
   Hochreiter, S. (2011) Complex networks govern coiled coil
   oligomerization - predicting and profiling by means of a machine
-  learning approach. Mol. Cell. Proteomics.
-  DOI: 10.1074/mcp.M110.004994}
+  learning approach. Mol. Cell. Proteomics 10(5):M110.004994.
+  DOI: 10.1074/mcp.M110.004994
+}
 \author{Ulrich Bodenhofer \email{bodenhofer@bioinf.jku.at}}
 \seealso{\code{\link{procoil}}, \code{\linkS4class{CCModel}},
 \code{\linkS4class{CCProfile}}}
 \examples{
 ## predict oligomerization of GCN4 wildtype
-GCN4wt<-predict(PrOCoilModel,
-                "MKQLEDKVEELLSKNYHLENEVARLKKLV",
-                "abcdefgabcdefgabcdefgabcdefga")
+GCN4wt <- predict(PrOCoilModel,
+                  "MKQLEDKVEELLSKNYHLENEVARLKKLV",
+                  "abcdefgabcdefgabcdefgabcdefga")
 
-## show and plot results
+## show result
 GCN4wt
-plot(GCN4wt)
+
+## example with four GCN4 mutations
+GCN4mSeq <- c("GCN4wt"        ="MKQLEDKVEELLSKNYHLENEVARLKKLV",
+              "GCN4_N16Y_L19T"="MKQLEDKVEELLSKYYHTENEVARLKKLV",
+              "GCN4_E22R_K27E"="MKQLEDKVEELLSKNYHLENRVARLEKLV",
+              "GCN4_V23K_K27E"="MKQLEDKVEELLSKNYHLENEKARLEKLV")
+
+## to illustrate the alternative interface, we convert this
+## character vector to an 'AAStringSet' object and add
+## heptad registers as annotation metadata
+GCN4mAA <- AAStringSet(GCN4mSeq)
+annotationMetadata(GCN4mAA, annCharset="abcdefg") <-
+    rep("abcdefgabcdefgabcdefgabcdefga", 4)
+
+## predict oligomerization (note: no 'reg' argument!)
+GCN4mut <- predict(PrOCoilModel, GCN4mAA)
+
+## display summary of result
+GCN4mut
 
 ## predict oligomerization of unknown sequence (Marcoil example)
-MarcoilEx<-predict(PrOCoilModel,
-                 "MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG",
-                 "-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------")
+MarcoilEx <- predict(PrOCoilModel,
+   "MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG",
+   "-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------")
 
-## show and plot results
+## show results
 MarcoilEx
-plot(MarcoilEx[[1]])
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

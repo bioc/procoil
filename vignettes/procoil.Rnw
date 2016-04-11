@@ -1,6 +1,5 @@
 \documentclass[article]{bioinf}
 
-\usepackage[noae]{Sweave}
 \usepackage{amsmath}
 \usepackage{hyperref}
 
@@ -18,17 +17,18 @@ Linz\\Altenberger Str. 69, 4040 Linz, Austria\\
 \newcommand{\PrOCoil}{PrOCoil}
 \newcommand{\R}{R}
 
-% \VignetteIndexEntry{PrOCoil - A Web Service and an R Package for Predicting the Oligomerization of Coiled-Coil Proteins}
-% \VignetteDepends{methods, stats, graphics, utils}
+%\VignetteIndexEntry{PrOCoil - A Web Service and an R Package for Predicting the Oligomerization of Coiled-Coil Proteins}
+%\VignetteDepends{methods, stats, graphics, utils}
+%\VignetteEngine{knitr::knitr}
 
-\SweaveOpts{eps=FALSE}
 \setlength{\fboxrule}{1.5pt}
 
 \begin{document}
-<<LoadPackageToDetermineVersion,echo=FALSE>>=
-options(width=65)
+<<LoadPackageToDetermineVersion,echo=FALSE,message=FALSE,results='hide'>>=
+options(width=72)
+knitr::opts_knit$set(width=72)
 set.seed(0)
-library(procoil)
+library(procoil, quietly=TRUE)
 procoilVersion <- packageDescription("procoil")$Version
 procoilDateRaw <- packageDescription("procoil")$Date
 procoilDateYear <- as.numeric(substr(procoilDateRaw, 1, 4))
@@ -110,17 +110,17 @@ graphics are produced in a non-customizable standard format
 & graphics are customizable
 \\
 \hline
-every sequence must be analyzed separately &
-analyses can be automated and run in batch mode through \R's
-scripting environment
+only single sequences or at most pairs of sequences with the same heptad register
+can be analyzed at a time &
+multiple sequences can be analyzed per run
 \\
 \hline
 beside standard input (amino acid sequence $+$ aligned heptad
 annotation), also PairCoil2 output format is
 supported; Marcoil output can be used upon a separate
 pre-processing step &
-only standard input (amino acid sequence $+$ aligned heptad
-annotation)
+only standard input (amino acid sequence(s) $+$ aligned heptad
+annotation(s))
 \\
 \hline
 \end{tabular}
@@ -397,7 +397,9 @@ coiled coils.
 As a first example, the following command makes a prediction for the
 GCN4 wild type already used above:
 <<PredictGCN4WildType>>=
-GCN4wt <- predict(PrOCoilModel, "MKQLEDKVEELLSKNYHLENEVARLKKLV", "abcdefgabcdefgabcdefgabcdefga")
+GCN4wt <- predict(PrOCoilModel,
+                  "MKQLEDKVEELLSKNYHLENEVARLKKLV",
+                  "abcdefgabcdefgabcdefgabcdefga")
 @
 
 The object \texttt{PrOCoilModel} is an object of class
@@ -413,7 +415,8 @@ The second argument is obviously the amino acid sequence and the third
 argument is the heptad annotation. The order of the two latter may be changed
 by naming arguments:
 <<PredictGCN4WildType2>>=
-GCN4wt <- predict(PrOCoilModel, reg="abcdefgabcdefgabcdefgabcdefga",
+GCN4wt <- predict(PrOCoilModel,
+                  reg="abcdefgabcdefgabcdefgabcdefga",
                   seq="MKQLEDKVEELLSKNYHLENEVARLKKLV")
 @
 
@@ -422,15 +425,15 @@ anything that can be cast into a character string works, in particular,
 objects of class \texttt{BString} or \texttt{AAString} (see package \texttt{Biostrings}
 from Bioconductor\footnote{\url{http://www.bioconductor.org/}}).
 
-The model and the sequence are compulsory arguments. To supply a heptad register
-is compulsory too, but it can also be supplied by means of an attribute or
-\texttt{Biostrings} metadata (see \ref{sssec:reg}).
+The model and sequence(s) are mandatory arguments. To supply heptad registers
+is compulsory too, but it can also be supplied attaching them to
+the sequences (see \ref{sssec:reg}).
 
 As mentioned in Section\ \ref{sec:input}, the sequence and the register annotation must
-have equal lengths. The function \texttt{predict}
+have equal lengths. The function \texttt{predict()}
 creates an object of class \texttt{CCProfile} in which prediction results
 along with various additional information is stored. To obtain more information
-about this class, enter \texttt{help(CCProfile)}. Basic information about
+about this class, enter \texttt{?CCProfile}. Basic information about
 the result can be displayed by \texttt{show(GCN4wt)} or simply by entering
 the name of the object:
 <<DisplayResultForGCN4WildType>>=
@@ -442,15 +445,15 @@ Section\ \ref{sec:webpredict} above.
 A prediction profile can be plotted simply as
 follows:
 \begin{center}
-<<PlotResultForGCN4WildType,fig=TRUE,echo=TRUE,width=7.25,height=6>>=
+<<PlotResultForGCN4WildType,fig.width=7,fig.height=5.5,out.width='0.6\\textwidth'>>=
 plot(GCN4wt)
 @
 \end{center}
 
-The \texttt{plot} function for \texttt{CCProfile} objects provides various
+The \texttt{plot()} function for \texttt{CCProfile} objects provides various
 ways for customizing the plot and for writing directly to graphics files
 (see also \ref{sssec:plots} and the documentation available via
-\verb+help("plot-methods")+).
+\verb+?plot.CCProfile+).
 
 \subsection{Predictions for non-trimmed sequences containing coiled
 coil segments}
@@ -467,59 +470,85 @@ the order they appear in the sequence. Let us consider the Marcoil
 sample sequence again:
 
 {\footnotesize
-<<PredictMarcoilExample,keep.source=TRUE>>=
+<<PredictMarcoilExample>>=
 res <- predict(PrOCoilModel,
 "MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG",
 "-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------")
 @
 }
 
-\noindent The returned object \texttt{res} is a list of \texttt{CCProfile}
-objects:
+\noindent The returned object \texttt{res} is a \texttt{CCProfile}
+object that contains the predictions and profiles of all coiled coil segments
+that were found in the sequences. In the given example, this is just one segment:
 <<DisplayResultForMarcoilExample>>=
 res
 @
-Each component of the returned list is named ``$s$\_$e$'', where $s$ and $e$ are
-the start and end positions of the coiled coil segment in the original sequence.
-In the above example, therefore, `\texttt{32$\_$66}' means that the coiled coil
-segment consists of residues 32--66 in the original sequence.
-
+If the sequences were unnamed, the segments will also remain unnamed in the resulting
+\texttt{CCProfile} object. However, if the sequences were named, the segments
+are named according to a specific strategy. This strategy is best explained by the
+following example: suppose the \texttt{seq} argument consists of 3 sequences named
+``\texttt{S1}'', ``\texttt{S2}'', and ``\texttt{S3}'', and assume that sequence
+``\texttt{S1}'' contains one coiled coil segment, ``\texttt{S2}'' contains three
+coiled coil segments, and ``\texttt{S3}'' contains no coiled
+coil segment. Then the resulting \texttt{CCProfile} object will contain predictions
+and profiles of a total of four coiled coil segments whose names are
+``\texttt{S1.1}'', ``\texttt{S2.1}'', ``\texttt{S2.2}'', and ``\texttt{S2.3}''.
 
 The prediction profile must be plotted for each coiled coil segment separately.
-This can be done by accessing the list components explicitly:
+This can be done by accessing the respective entry in the \texttt{CCProfile} object explicitly:
 \begin{center}
-<<PlotResultForMarcoilExample,fig=TRUE,echo=TRUE,width=8.75,height=6>>=
-plot(res[[1]])
+<<PlotResultForMarcoilExample,fig.width=8,fig.height=5.5,out.width='0.7\\textwidth'>>=
+plot(res[1])
 @
 \end{center}
-
-\notebox{\texttt{predict} returns a list whenever it finds at least
-one dash in the heptad annotation, regardless of whether there is
-only one or more than one coiled coil segment in the data.}
 
 \subsection{Comparative mutation analysis}
 
 The \PrOCoil\ \R\ package allows not only to consider input sequences completely
 independently of one another, but also allows for overlaying profiles of aligned coiled
 coil segments. This feature is useful, for example, for studying effects of
-different mutations. As an example, we consider a double mutation of GCN4:
+different mutations. As an example, we consider multiple mutations of GCN4:
+<<PredictGCN4Mutation>>=
+GCN4mSeq <- c("GCN4wt"        ="MKQLEDKVEELLSKNYHLENEVARLKKLV",
+              "GCN4_N16Y_L19T"="MKQLEDKVEELLSKYYHTENEVARLKKLV",
+              "GCN4_E22R_K27E"="MKQLEDKVEELLSKNYHLENRVARLEKLV",
+              "GCN4_V23K_K27E"="MKQLEDKVEELLSKNYHLENEKARLEKLV")
+GCN4mReg <- rep("abcdefgabcdefgabcdefgabcdefga", 4)
+
+GCN4mut <- predict(PrOCoilModel, GCN4mSeq, GCN4mReg)
+GCN4mut
+@
+The \texttt{plot()} function allows for plotting two profiles in one plot:
 \begin{center}
-<<PredictGCN4Mutation,fig=TRUE,echo=TRUE,width=7.25,height=6>>=
-GCN4m <- predict(PrOCoilModel, "MKQLEDKVEELLSKIYHNENEVARLKKLV", "abcdefgabcdefgabcdefgabcdefga")
-GCN4m
-plot(GCN4wt, GCN4m)
+<<PlotGCN4Mutation,fig.width=7,fig.height=5.5,out.width='0.6\\textwidth'>>=
+plot(GCN4mut[c(1, 2)])
+plot(GCN4mut[c(1, 3)])
+plot(GCN4mut[c(1, 4)])
 @
 \end{center}
-By default, the profile corresponding of the first argument passed to \verb+plot+ is
-plotted in red and the second argument's profile is plotted in blue. The sequence of
-the first argument is shown above the graph and the second argument's sequence is
+By default, the first profile is plotted in red and the second profile is plotted in blue.
+The first sequence is shown above the graph and the second sequence is
 shown below the graph. Black letters correspond to residues that are the same in the
-two sequences, whereas mutations are highlighted in color. More information on how to
+two sequences, whereas mutations are highlighted in the corresponding colors. More information on how to
 customize plots is available in \ref{sssec:plots} and the documentation available
-via \verb+help("plot-methods")+.
+via \verb+?plot.CCProfile+.
 
-\notebox{profile overlays only work if the two sequences have been equally long and
-if their heptad annotations are exactly the same.}
+\notebox{Profile overlays also work if the two sequences are not equally long and/or
+if their heptad annotations are not aligned to each other. However, this hardly makes sense,
+so the overlay of profiles is primarily made for showing profiles of aligned sequences with
+matching heptad registers.}
+
+For three or more sequences, the profiles can also be visualized as heatmaps:
+\begin{center}
+<<HeatmapGCN4Mutation,fig.width=8,fig.height=4.5,out.width='0.9\\textwidth'>>=
+heatmap(GCN4mut)
+@
+\end{center}
+In this view, profiles/sequences are even hierarchically clustered. The dendrogram is shown to the left
+of the heatmap. In the example above, obviously, the two trimers are clustered together as
+rows 1--2 and the two dimers are clustered together as rows 3--4. The note from above applies to
+heatmaps too: heatmaps make most sense for showing profiles of aligned sequences with
+matching heptad registers.
 
 \subsection{Miscellanea}
 
@@ -543,8 +572,10 @@ the \PrOCoil\ \R\ package, heptad irregularities are additionally
 visualized by a vertical red line between the two positions that do
 not conform to the usual regular pattern.
 \begin{center}
-<<PlotResultForExampleWithHeptadIrregularity,fig=TRUE,echo=TRUE,width=5.75,height=6>>=
-plot(predict(PrOCoilModel, "LQDTLVRQERPIRKSIEDLRNTV", "defgabcdefgabcdabcdefga"))
+<<PlotResultForExampleWithHeptadIrregularity,fig.width=7,fig.height=5.5,out.width='0.6\\textwidth'>>=
+plot(predict(PrOCoilModel,
+             "LQDTLVRQERPIRKSIEDLRNTV",
+             "defgabcdefgabcdabcdefga"))
 @
 \end{center}
 
@@ -570,43 +601,48 @@ standard model \verb+PrOCoilModel+, the alternative model
 \verb+PrOCoilModelBA+ is automatically
 available once the \PrOCoil\ \R\  has been loaded.
 
+In case the user wants to define custom models or wishes to use previous versions of
+the prediction models, the functions \texttt{readCCModel} and
+\texttt{writeCCModel} can be used to read/write models
+from/to plain text files that can be viewed and also modified.
 For transparency and future safety , the \PrOCoil\ \R\ package further provides an
 open interface for loading custom classification models from a file. For this
 purpose, the function \verb+readCCModel+ is available. In order to see how
 such a model file should be organized, the two models included in the \PrOCoil\ \R\
 package are available for download at:
-
-\begin{samepage}
 \begin{quotation}
-\noindent\url{http://www.bioinf.jku.at/software/procoil/PrOCoilModel.patternmodel}\newline
-\noindent\url{http://www.bioinf.jku.at/software/procoil/PrOCoilModelBA.patternmodel}
+\noindent\url{http://www.bioinf.jku.at/software/procoil/PrOCoilModel_v2.CCModel}\newline
+\noindent\url{http://www.bioinf.jku.at/software/procoil/PrOCoilModelBA_v2.CCModel}
 \end{quotation}
-\end{samepage}
-
-\noindent It is also possible to read them directly using the \texttt{readCCModel} command:
+\noindent It is also possible to read them directly using the \texttt{readCCModel()} function:
 
 {\footnotesize
 <<ReadModelFile,eval=FALSE>>=
-readCCModel("http://www.bioinf.jku.at/software/procoil/PrOCoilModel.patternmodel")
+myModel <- readCCModel("http://www.bioinf.jku.at/software/procoil/PrOCoilModel_v2.CCModel")
 @
 }
 
-<<ShowDefaultModel,echo=FALSE>>=
-PrOCoilModel
-@
+The present version of the \R\ package includes newer models than the ones reported in
+\cite{MahrenholzAbfalterBodenhoferVolkmerHochreiter11} (which were used in \PrOCoil versions
+before 2.0.0). However, for backward compatibility,
+these models can still be downloaded and used with the \PrOCoil\ \R\ package:
+\begin{quotation}
+\noindent\url{http://www.bioinf.jku.at/software/procoil/PrOCoilModel_v1.CCModel}\newline
+\noindent\url{http://www.bioinf.jku.at/software/procoil/PrOCoilModelBA_v1.CCModel}
+\end{quotation}
 
 \subsubsection{Customizing and saving plots}\label{sssec:plots}
 
 The \PrOCoil\ \R\ package provides several opportunities to customize plots.
-For more detailed documentation, see \verb+help("plot-methods")+. We simply
+For more detailed documentation, see \verb+?plot.CCProfile+. We simply
 provide an example here that uses legends, shading, custom coloring of profiles, and
 a plot header:
 
 \begin{center}
-<<CustomPlot,fig=TRUE,echo=TRUE,width=7.25,height=6>>=
-plot(GCN4wt, GCN4m, legend=c("wild type", "mutant N16I,L19N"),
-     col=c(rgb(0.7,0,0), rgb(0,0,0.8)), main="GCN4 Mutation Analysis",
-     shades=c(rgb(0.77,0.85,0.95),rgb(0.99,0.84,0.71)))
+<<CustomPlot,fig.width=7,fig.height=5.5,out.width='0.6\\textwidth'>>=
+plot(GCN4mut[c(1, 2)], legend=c("wild type", "mutant N16Y,L19T"),
+     col=c(rgb(0.7, 0, 0), rgb(0, 0, 0.8)), main="GCN4 Mutation Analysis",
+     shades=c(rgb(0.77, 0.85, 0.95), rgb(0.99, 0.84, 0.71)))
 @
 \end{center}
 
@@ -625,10 +661,13 @@ a few hundred pixels for bitmap image formats (BMP, JPEG, TIFF, PNG).
 
 \noindent{\bf Examples:}
 <<PlotProfileToGraphicsFile,eval=FALSE>>=
-pdf(file="GCN4wt.pdf",height=6,width=nchar(GCN4wt@seq)*6/24)
+pdf(file="GCN4wt.pdf", height=6,
+    width=max(nchar(sequences(GCN4wt))) * 6 / 24)
 plot(GCN4wt)
 dev.off()
-bmp(file="GCN4wt.bmp",height=480,width=nchar(GCN4wt@seq)*480/24)
+
+bmp(file="GCN4wt.bmp", height=480,
+    width=max(nchar(sequences(GCN4wt))) * 480 / 24)
 plot(GCN4wt)
 dev.off()
 @
@@ -639,34 +678,41 @@ dev.off()
 As mentioned briefly in Subsection\ \ref{ssec:getstarted}, the \texttt{predict}
 function requires
 a string that contains the heptad register annotation of the sequence to be classified.
-Normally, this string is passed as the argument \texttt{reg}. Alternatively, one can attach the
-heptad register to the sequence object by means of the \texttt{reg} attribute:
-<<GCN4ExampleWithAttribute>>=
-GCN4wtseq<-"MKQLEDKVEELLSKNYHLENEVARLKKLV"
-attr(GCN4wtseq,"reg")<-"abcdefgabcdefgabcdefgabcdefga"
-predict(PrOCoilModel,GCN4wtseq)
+Normally, this string is passed as the argument \texttt{reg}. However, the following
+alternatives exist as well:
+\begin{itemize}
+\item If \texttt{seq} is a character vector, the heptad register can also be supplied via
+the attribute \texttt{reg}:
+<<GCN4CharacterExampleWithAttribute>>=
+GCN4wtSeq1 <- "MKQLEDKVEELLSKNYHLENEVARLKKLV"
+attr(GCN4wtSeq1, "reg") <- "abcdefgabcdefgabcdefgabcdefga"
+res <- predict(PrOCoilModel, GCN4wtSeq1)
 @
-The same works if a \texttt{Biostrings} object is supplied to \texttt{predict}:
-<<GCN4ExampleUsingBiostringWithAttribute>>=
-require(Biostrings)
-GCN4wtseq2<-AAString("MKQLEDKVEELLSKNYHLENEVARLKKLV")
-attr(GCN4wtseq2,"reg")<-"abcdefgabcdefgabcdefgabcdefga"
-predict(PrOCoilModel,GCN4wtseq2)
+\item If \texttt{seq} is a single amino acid sequence given as an \texttt{AAString} object,
+the heptad register can be specified via a metadata component \texttt{reg}:
+<<GCN4AAStringExampleWithMetadata>>=
+GCN4wtSeq2 <- AAString("MKQLEDKVEELLSKNYHLENEVARLKKLV")
+metadata(GCN4wtSeq2)$reg <- "abcdefgabcdefgabcdefgabcdefga"
+res <- predict(PrOCoilModel, GCN4wtSeq2)
 @
-For \texttt{Biostrings} objects, the register can also be supplied by a
-component named \texttt{reg} as part of the \texttt{metadata} slot:
-<<GCN4ExampleUsingBiostringWithMetaData>>=
-GCN4wtseq3<-AAString("MKQLEDKVEELLSKNYHLENEVARLKKLV")
-GCN4wtseq3@metadata$reg<-"abcdefgabcdefgabcdefgabcdefga"
-predict(PrOCoilModel,GCN4wtseq3)
+\item If \texttt{seq} is a set of amino acid sequences given as an
+\texttt{AAStringSet} or \texttt{AAVector} object, the heptad registers can be specified
+via a metadata component \texttt{reg} as above or via the annotation
+metadata:
+<<GCN4AAStringSetExampleWithAnnotationMetadata>>=
+GCN4mSeq2 <- AAStringSet(GCN4mSeq)
+annotationMetadata(GCN4mSeq2, annCharset="abcdefg") <- GCN4mReg
+res <- predict(PrOCoilModel, GCN4mSeq2)
 @
-The \texttt{predict} function proceeds as follows: if the argument \texttt{reg} is present,
-it takes the content of this argument as heptad register. If the argument \texttt{reg} is
-missing, \texttt{predict} takes the \texttt{reg} attribute of the \texttt{seq} argument
-if this attribute exists. If the attribute does not exist and if \texttt{seq} is of
-class \texttt{BString} or \texttt{AAString}, then \texttt{predict} looks for a component
-named \texttt{reg} in the \texttt{metadata} slot of \texttt{seq}. If no heptad register is
-found in any of these three places, \texttt{predict} quits with an error message.
+\end{itemize}
+In any case, the \texttt{reg} argument has priority over all other
+ways of specifying the heptad annotation. In other words,
+if \texttt{reg} is specified and \texttt{seq} contains heptad
+annotations in one of the ways described above, the
+\texttt{reg} argument has priority and the heptad annotation in
+\texttt{seq} is ignored. If no heptad register is
+found in any of the places mentioned above, \texttt{predict()}
+quits with an error message.
 
 \section{More Details About \PrOCoil}
 
@@ -687,17 +733,14 @@ acids at fixed heptad positions with no more than a maximum number
 $m$ of residues in between. Internally, these patterns are
 represented as strings with an amino acid letter on the first
 position, then a certain number of wildcards (between 0 and $m$ as
-noted above), then the second amino acid letter, and finally a
-letter `\verb+a+'--`\verb+g+' denoting the heptad register position
-of the first amino acid, e.g.\ ``\verb+N..La+''. This pattern
+noted above), then the second amino acid letter, and finally an
+aligned sequence starting and ending with a letter `\verb+a+'--`\verb+g+'
+denoting the heptad register position of the first and the last
+amino acid, e.g.\ ``\verb+N..La..d+''. This pattern
 matches a coiled coil sequence if the sequence has an `\verb+N+'
 (Asparagine) at an `\verb+a+' position and an `\verb+L+' (Leucine)
-at the next `\verb+d+' position.\footnote{The heptad position of the
-second amino acid is tacitly assumed to comply to the regular heptad
-repeat. If the sequence has irregularities in its heptad annotation,
-\PrOCoil\ only considers the patterns which match in both
-positions.} For instance, the GCN4 wild type has one occurrence of
-this pattern:
+at the next `\verb+d+' position. For instance, the GCN4 wild type has
+one occurrence of this pattern:
 \begin{quote}
 {\footnotesize\begin{verbatim}
 MKQLEDKVEELLSKNYHLENEVARLKKLV
@@ -720,7 +763,7 @@ normalization \cite{SchoelkopfTsudaVert04} to correct for different
 sequence lengths. This means that the support vector machines have
 been trained with the kernel
 \[
-k'(x,y)=\frac{k(x,y)}{\sqrt{k(x,x)\cdot k(y,y)}},
+k'(x, y)=\frac{k(x, y)}{\sqrt{k(x, x)\cdot k(y,y)}},
 \]
 where $k(.,.)$ is the {\em coiled coil kernel} described above.
 
@@ -757,20 +800,23 @@ optimized for balanced accuracy (object \verb+PrOCoilModelBA+
 in the \PrOCoil\ \R\ package). Both models have been trained on the same training
 set which consisted of verified coiled coils from the PDB enriched
 by putatively similar sequences that were obtained by BLAST in
-conjunction with Marcoil. The default model was created with libSVM's C-SVM
-implementation \cite{ChangLin01} using the normalized coiled coil kernel
-with $m=7$ and a penalty parameter of $C=8$. The alternative mode
-was created with PSVM \cite{HochreiterObermayer06} using the
+conjunction with Marcoil. The default model was created with the KeBABS package
+\cite{PalmeHochreiterBodenhofer15} using the coiled coil kernel mentioned above
+(in the lingo of the KeBABS package called {\em annotation-specific gappy pair kernel})
+and the frontend to LibLineaR package, which provides an R interface to LIBLINEAR
+\cite{FanChangHsiehWangLin08}. The current models (since Version 2.0.0) use
+the normalized coiled coil kernel with $m=5$ and a penalty parameter of $C=2$.
+The alternative modes was created with PSVM \cite{HochreiterObermayer06} using the
 normalized coiled coil kernel with $m=8$, class balancing, and regularization
-parameters $C=2$ and $\varepsilon=1.3$.
+parameters $C=8$ and $\varepsilon=0.8$.
 
 In the \PrOCoil\ \R\ package, all parameters describing a model are
 stored in the corresponding \texttt{CCModel} object:
 <<DisplayModels>>=
 PrOCoilModel
-weights(PrOCoilModel)["N..La"]
+weights(PrOCoilModel)["N..La..d"]
 PrOCoilModelBA
-weights(PrOCoilModelBA)["N..La"]
+weights(PrOCoilModelBA)["N..La..d"]
 @
 In both models, the pattern weights  are sorted decreasingly,
 i.e., from most trimeric to most dimeric. Thus, the user also has easy access
@@ -778,9 +824,9 @@ to the most indicative patterns. Here we provide an example how to extract the
 25 most trimeric (i.e.\ the first 25 patterns in the list) and the 25 most
 dimeric patterns (i.e.\ the last 25 patterns in the list) from the \PrOCoil\ model:
 <<DisplayWeights>>=
-noP<-length(weights(PrOCoilModel))
+noP <- length(weights(PrOCoilModel))
 names(weights(PrOCoilModel))[1:25]
-names(weights(PrOCoilModel))[noP:(noP-24)]
+names(weights(PrOCoilModel))[noP:(noP - 24)]
 @
 
 \subsection{How prediction profiles are obtained}\label{ssec:profiles}
@@ -862,91 +908,97 @@ following into your R session:
 toBibtex(citation("procoil"))
 @
 
-%\bibliographystyle{plain}
-%\bibliography{Bioinformatics,MachineLearningClassical,BodenhoferPub}
+%%\bibliographystyle{plain}
+%%\bibliography{Bioinformatics,MachineLearningClassical,BodenhoferPub}
 
 \begin{thebibliography}{10}
 
 \bibitem{BergerWilsonWolfTonchevMillaKim95}
-B.\ Berger, D.\ B. Wilson, E.\ Wolf, T.\ Tonchev, M.\ Milla, and P.\ S. Kim.
+B.~Berger, D.~B. Wilson, E.~Wolf, T.~Tonchev, M.~Milla, and P.~S. Kim.
 \newblock Predicting coiled coils by use of pairwise residue correlations.
 \newblock {\em Proc. Natl. Acad. Sci. USA}, 92:8259--8263, 1995.
 
 \bibitem{BodenhoferSchwarzbauerIonescuHochreiter09}
-U.\ Bodenhofer, K.\ Schwarzbauer, M.\ Ionescu, and S.\ Hochreiter.
+U.~Bodenhofer, K.~Schwarzbauer, M.~Ionescu, and S.~Hochreiter.
 \newblock Modeling position specificity in sequence kernels by fuzzy
   equivalence relations.
-\newblock In J.\ P. Carvalho, D.\ Dubois, U.\ Kaymak, and J.\ M.\ C. Sousa, editors,
+\newblock In J.~P. Carvalho, D.~Dubois, U.~Kaymak, and J.~M.~C. Sousa, editors,
   {\em Proc. Joint 13th IFSA World Congress and 6th EUSFLAT Conference}, pages
   1376--1381, Lisbon, July 2009.
 
 \bibitem{Burges98}
-C.\ J.\ M. Burges.
+C.~J.~M. Burges.
 \newblock A tutorial on support vector machines for pattern recognition.
 \newblock {\em Data Min. Knowl. Discov.}, 2:121--167, 1998.
 
-\bibitem{ChangLin01}
-C.-C. Chang and C.-J. Lin.
-\newblock {\em {LIBSVM}: a library for support vector machines}, 2001.
-\newblock Software available at \url{http://www.csie.ntu.edu.tw/~cjlin/libsvm}.
-
 \bibitem{CortesVapnik95}
-C.\ Cortes and V.\ N. Vapnik.
+C.~Cortes and V.~N. Vapnik.
 \newblock Support vector networks.
 \newblock {\em Machine Learning}, 20:273--297, 1986.
 
 \bibitem{DelorenziSpeed02}
-M.\ Delorenzi and T.\ Speed.
+M.~Delorenzi and T.~Speed.
 \newblock An {HMM} model for coiled-coil domains and a comparison with
   {PSSM}-based predictions.
 \newblock {\em Bioinformatics}, 18(4):617--625, 2002.
 
+\bibitem{FanChangHsiehWangLin08}
+R.-E. Fan, K.-W. Chang, C.-J. Hsieh, X.-R. Wang, and C.-J. Lin.
+\newblock {LIBLINEAR:} a library for large linear classification.
+\newblock {\em J. Mach. Learn. Res.}, 9:1871--1874, 2008.
+
 \bibitem{FongKeatingSingh04}
-J.\ H. Fong, A.\ E. Keating, and M.\ Singh.
+J.~H. Fong, A.~E. Keating, and M.~Singh.
 \newblock Predicting specificity in {bZIP} coiled-coil protein interactions.
 \newblock {\em Genome Biol.}, 5:R11, 2004.
 
 \bibitem{HochreiterObermayer06}
-S.\ Hochreiter and K.\ Obermayer.
+S.~Hochreiter and K.~Obermayer.
 \newblock Support vector machines for dyadic data.
 \newblock {\em Neural Comput.}, 18:1472--1510, 2006.
 
 \bibitem{KuksaHuangPavlovic08}
-P.\ Kuksa, P.-H. Huang, and V.\ Pavlovic.
+P.~Kuksa, P.-H. Huang, and V.~Pavlovic.
 \newblock A fast, large-scale learning method for protein sequence
   classification.
 \newblock In {\em 8th Int. Workshop on Data Mining in Bioinformatics}, pages
   29--37, Las Vegas, NV, 2008.
 
 \bibitem{MahrenholzAbfalterBodenhoferVolkmerHochreiter11}
-C.\ C. Mahrenholz, I.\ G. Abfalter, U.\ Bodenhofer, R.\ Volkmer, and S.\ Hochreiter.
+C.~C. Mahrenholz, I.~G. Abfalter, U.~Bodenhofer, R.~Volkmer, and S.~Hochreiter.
 \newblock Complex networks govern coiled coil oligomerization --- predicting
   and profiling by means of a machine learning approach.
-\newblock {\em Mol. Cell. Proteomics} 10(5), 2011.
+\newblock {\em Mol. Cell. Proteomics}, 10(5):M110.004994, 2011.
 
 \bibitem{McDonnellJiangKeatingBerger06}
-A.\ V. McDonnell, T.\ Jiang, A.\ E. Keating, and B.\ Berger.
+A.~V. McDonnell, T.~Jiang, A.~E. Keating, and B.~Berger.
 \newblock Paircoil2: improved prediction of coiled coils from sequence.
 \newblock {\em Bioinformatics}, 22(3):356--358, 2006.
 
 \bibitem{MuellerMikaRaetschTsudaSchoelkopf01}
-K.-R. M\"uller, S.\ Mika, G.\ R\"atsch, K.\ Tsuda, and B.\ Sch\"olkopf.
+K.-R. M\"uller, S.~Mika, G.~R\"atsch, K.~Tsuda, and B.~Sch\"olkopf.
 \newblock An introduction to kernel-based learning algorithms.
 \newblock {\em IEEE Trans. Neural Networks}, 12(2):181--201, 2001.
 
+\bibitem{PalmeHochreiterBodenhofer15}
+J.~Palme, S.~Hochreiter, and U.~Bodenhofer.
+\newblock {KeBABS}: an {R} package for kernel-based analysis of biological
+  sequences.
+\newblock {\em Bioinformatics}, 31(15):2574--2576, 2015.
+
 \bibitem{SchoelkopfSmola02}
-B.\ Sch\"olkopf and A.\ J. Smola.
+B.~Sch\"olkopf and A.~J. Smola.
 \newblock {\em Learning with Kernels}.
 \newblock Adaptive Computation and Machine Learning. MIT Press, Cambridge, MA,
   2002.
 
 \bibitem{SchoelkopfTsudaVert04}
-B.\ Sch\"olkopf, K.\ Tsuda, and J.-P. Vert, editors.
+B.~Sch\"olkopf, K.~Tsuda, and J.-P. Vert, editors.
 \newblock {\em Kernel Methods in Computational Biology}.
 \newblock MIT Press, Cambridge, MA, 2004.
 
 \bibitem{WalshawWoolfson01}
-J.\ Walshaw and D.\ N. Woolfson.
+J.~Walshaw and D.~N. Woolfson.
 \newblock {SOCKET:} a program for identifying and analysing coiled-coil motifs
   within protein structures.
 \newblock {\em J. Mol. Biol.}, 307(5):1427--1450, 2001.

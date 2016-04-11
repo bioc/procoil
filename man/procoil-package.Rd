@@ -4,22 +4,20 @@
 \docType{package}
 \title{Prediction of Oligomerization of Coiled Coil Proteins}
 \description{
-The \pkg{procoil} package allows to predict whether a
-coiled coil sequence (amino acid sequence plus heptad
-register) is more likely to form a dimer or more likely
-to form a trimer. The predict function not only computes
-the prediction itself, but also a profile which allows to
-determine the strengths to which the individual residues
-are indicative for either class. Profiles can also be
-visualized graphically using a plot function.
+  The package allows for predicting whether a
+  coiled coil sequence (amino acid sequence plus heptad
+  register) is more likely to form a dimer or more likely
+  to form a trimer. Additionally to the prediction itself,
+  a profile is computed which allows for determining the
+  strengths to which the individual residues are indicative
+  for either class. Prediction profiles can also be visualized.
 }
 \details{
 The package defines two S4 classes, \code{\linkS4class{CCModel}} and
 \code{\linkS4class{CCProfile}}. The former's purpose to represent
 a coiled coil prediction model. The default model
 \code{\link{PrOCoilModel}} is pre-loaded when the package is loaded.
-An alternative model \code{\link{PrOCoilModelBA}} can be loaded on
-demand.
+An alternative model \code{\link{PrOCoilModelBA}} is also available.
 Other models can be loaded with the function
 \code{\link{readCCModel}}. The
 \code{\link[=predict,CCModel-method]{predict}} function is
@@ -35,17 +33,18 @@ The resulting prediction profile can be visualized with
   Mahrenholz, C.C., Abfalter, I.G., Bodenhofer, U., Volkmer, R., and
   Hochreiter, S. (2011) Complex networks govern coiled coil
   oligomerization - predicting and profiling by means of a machine
-  learning approach. Mol. Cell. Proteomics.
-  DOI: 10.1074/mcp.M110.004994}
-\keyword{ package }
+  learning approach. Mol. Cell. Proteomics 10(5):M110.004994.
+  DOI: 10.1074/mcp.M110.004994
+}
+\keyword{package}
 \examples{
 ## display summary of default model
 PrOCoilModel
 
 ## predict oligomerization of GCN4 wildtype
-GCN4wt<-predict(PrOCoilModel,
-                "MKQLEDKVEELLSKNYHLENEVARLKKLV",
-                "abcdefgabcdefgabcdefgabcdefga")
+GCN4wt <- predict(PrOCoilModel,
+                  "MKQLEDKVEELLSKNYHLENEVARLKKLV",
+                  "abcdefgabcdefgabcdefgabcdefga")
 
 ## display result
 GCN4wt
@@ -54,13 +53,13 @@ GCN4wt
 plot(GCN4wt)
 
 ## predict oligomerization of unknown sequence (Marcoil example)
-MarcoilEx<-predict(PrOCoilModel,
-                 "MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG",
-                 "-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------")
+MarcoilEx <- predict(PrOCoilModel,
+                     "MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG",
+                     "-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------")
 
 ## display result
-MarcoilEx[[1]]
+MarcoilEx
 
 ## plot profile
-plot(MarcoilEx[[1]])
+plot(MarcoilEx)
 }
