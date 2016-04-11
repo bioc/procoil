@@ -4,26 +4,27 @@
 \docType{package}
 \title{Prediction of Oligomerization of Coiled Coil Proteins}
 \description{
-  The package allows for predicting whether a
-  coiled coil sequence (amino acid sequence plus heptad
-  register) is more likely to form a dimer or more likely
-  to form a trimer. Additionally to the prediction itself,
-  a profile is computed which allows for determining the
-  strengths to which the individual residues are indicative
-  for either class. Prediction profiles can also be visualized.
+  The package allows for predicting whether a coiled coil sequence
+  (amino acid sequence plus heptad register) is more likely to form
+  a dimer or more likely to form a trimer. Additionally to the
+  prediction itself, a prediction profile is computed which allows
+  for determining the strengths to which the individual residues
+  are indicative for either class. Prediction profiles can also
+  be visualized as curves or heatmaps.
 }
 \details{
 The package defines two S4 classes, \code{\linkS4class{CCModel}} and
-\code{\linkS4class{CCProfile}}. The former's purpose to represent
+\code{\linkS4class{CCProfile}}. The former's purpose is to represent
 a coiled coil prediction model. The default model
 \code{\link{PrOCoilModel}} is pre-loaded when the package is loaded.
 An alternative model \code{\link{PrOCoilModelBA}} is also available.
 Other models can be loaded with the function
 \code{\link{readCCModel}}. The
 \code{\link[=predict,CCModel-method]{predict}} function is
-used to predict the oligomerization of a coiled coil sequence (which
-consists of an amino acid sequence and a heptad register aligned to
-it). The result is stored in a \code{\linkS4class{CCProfile}} object.
+used to predict the oligomerization of one or more coiled coil
+sequences (which consist of a amino acid sequences and heptad
+registers aligned to them). The result is stored in a
+\code{\linkS4class{CCProfile}} object.
 The resulting prediction profile can be visualized with
 \code{\link[=plot,CCProfile,missing-method]{plot}}.
 }
@@ -54,8 +55,8 @@ plot(GCN4wt)
 
 ## predict oligomerization of unknown sequence (Marcoil example)
 MarcoilEx <- predict(PrOCoilModel,
-                     "MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG",
-                     "-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------")
+    "MGECDQLLVFMITSRVLVLSTLIIMDSRQVYLENLRQFAENLRQNIENVHSFLENLRADLENLRQKFPGKWYSAMPGRHG",
+    "-------------------------------abcdefgabcdefgabcdefgabcdefgabcdefg--------------")
 
 ## display result
 MarcoilEx

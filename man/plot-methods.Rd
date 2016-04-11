@@ -10,17 +10,17 @@
 }
 \usage{
 \S4method{plot}{CCProfile,missing}(x, col=c("red", "blue"),
-             standardize=TRUE, shades=NULL, legend="default",
-             legendPos="topright", xlab="", ylab="weight",
-             lwd.profile=1, lwd.axis=1, las=1,
-             heptads=TRUE, annotate=TRUE, ...)
+     standardize=TRUE, shades=NULL, legend="default",
+     legendPos="topright", xlab="", ylab="weight",
+     lwd.profile=1, lwd.axis=1, las=1,
+     heptads=TRUE, annotate=TRUE, ...)
 }
 \arguments{
   \item{x}{Object of class \code{\linkS4class{CCProfile}} to be
     plotted with \code{plot}}
   \item{col}{Character string containing the name(s) of the color(s)
     in which the profile(s) should be plotted.}
-  \item{standardize}{logical. If \code{FALSE}, the profile
+  \item{standardize}{If \code{FALSE}, the profile
     values \eqn{s_i}{si} are displayed as they are with the value
     \eqn{y=-b/L} superimposed as a light gray line. If \code{TRUE}
     (default), the profile(s) is/are shifted by the baseline values
@@ -31,12 +31,12 @@
     line  \eqn{y=-b/L} are shaded in colors \code{shades[1]} and
     \code{shades[2]}, respectively.}
   \item{legend}{A character string containing the legend/description of
-    the profile (in case \code{plot} is called with one
-    \code{\linkS4class{CCProfile}} argument). A vector of
-    character strings containing the legends/descriptions of
-    the profiles (in case \code{plot} is called with two
-    \code{\linkS4class{CCProfile}} arguments). If empty,
-    no legend is displayed.}
+    the profile. If \code{"default"}, the names of the
+    sequences/profiles are used. If no names are available, the profiles
+    are simply enumerated (as long as two profiles should be plot
+    together; if only a single unnamed profile is to be plotted, no
+    legend is shown). If \code{legend} is an empty string, no legend
+    is displayed at all.}
   \item{legendPos}{position specification for legend (if \code{legend}
     is specified). Can either be a vector with
     coordinates or a single keyword like

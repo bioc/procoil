@@ -12,77 +12,75 @@
 \title{Class "CCModel"}
 \description{S4 class representing a coiled coil prediction model}
 \section{Objects from the Class}{
-In principle, objects of this class can be created by calls of
-the form \code{new("CCModel")}, although it is probably never necessary
-to create such an object from scratch - and not advised either.
-The default model is stored in
-the object \code{PrOCoilModel}. An alternative model,
-\code{PrOCoilModelBA}, that is optimized for balanced accuracy
-is available too (see below). For future safety, other models can be loaded
-from files using the function \code{\link{readCCModel}}.
+  In principle, objects of this class can be created by calls of
+  the form \code{new("CCModel")}, although it is probably never necessary
+  to create such an object from scratch - and not advised either.
+  The default model is stored in
+  the object \code{PrOCoilModel}. An alternative model,
+  \code{PrOCoilModelBA}, that is optimized for balanced accuracy
+  is available too (see below). Custom models can be loaded
+  from files using the function \code{\link{readCCModel}}.
 }
 \section{Discriminant function of model}{
-  \describe{
-     Given a new coiled coil sequence \eqn{x} and a model,
-     the discriminant function of the model is given as 
+  Given a new coiled coil sequence \eqn{x} and a model,
+  the discriminant function of the model is given as 
 
-     \deqn{f(x)=b+\sum_{p\in P} N(p,x)\cdot w(p),}{%
-           f(x)=b+sum over all p in P of (N(p,x) w(p)),}
+  \deqn{f(x)=b+\sum_{p\in P} N(p,x)\cdot w(p),}{%
+    f(x)=b+sum over all p in P of (N(p,x) w(p)),}
 
-     where \eqn{b} is a constant,  \eqn{N(p,x)} denotes the number of
-     occurrences of pattern \eqn{p} in sequence \eqn{x}, and
-     \eqn{w(p)} is the weight assigned to pattern \eqn{p}. \eqn{P}
-     is the set of all patterns contained in the model.
-     In the models used in the \pkg{procoil} package, the 
-     weights are computed from a support vector machine. Models can
-     include kernel normalization or not. The formula above refers to
-     the variant without kernel normalization. If kernel normalization
-     is employed, the weights are computed in a different way and the
-     discriminant function changes to
+  where \eqn{b} is a constant offset,  \eqn{N(p,x)} denotes the number of
+  occurrences of pattern \eqn{p} in sequence \eqn{x}, and
+  \eqn{w(p)} is the weight assigned to pattern \eqn{p}. \eqn{P}
+  is the set of all patterns contained in the model.
+  In the models used in the \pkg{procoil} package, the 
+  weights are computed from a support vector machine. Models can
+  include kernel normalization or not. The formula above refers to
+  the variant without kernel normalization. If kernel normalization
+  is employed, the weights are computed in a different way and the
+  discriminant function changes to
 
-     \deqn{f(x)=b+\frac{\sum_{p\in P} N(p,x)\cdot w(p)}{R(x)},}{%
-           f(x)=b+(sum over all p in P of (N(p,x) w(p)))/R(x),}
+  \deqn{f(x)=b+\frac{\sum_{p\in P} N(p,x)\cdot w(p)}{R(x)},}{%
+    f(x)=b+(sum over all p in P of (N(p,x) w(p)))/R(x),}
 
-     where \eqn{R(x)} is a normalization value depending on the
-     sample \eqn{x}. It is defined as follows:
+  where \eqn{R(x)} is a normalization value depending on the
+  sample \eqn{x}. It is defined as follows:
 
-     \deqn{R(x)=\sqrt{\sum_{p\in P} N(p,x)^2}}{%
-           R(x)=sqrt(sum over all p in P of N(p,x)^2)}
+  \deqn{R(x)=\sqrt{\sum_{p\in P} N(p,x)^2}}{%
+    R(x)=sqrt(sum over all p in P of N(p,x)^2)}
 
-     The \pkg{procoil} package does not consider arbitrary
-     patterns, but only very specific ones: pairs of amino acids at
-     fixed register positions with no more than a maximum number
-     \eqn{m} of residues in between. Internally, these patterns are
-     represented as strings with an amino acid letter on the first
-     position, then a certain number of wildcards (between 0 and
-     \eqn{m} as noted above), then the second amino acid letter, and
-     an aligned sequence with the same number of wildcards and letters
-     \sQuote{a}-\sQuote{g} denoting the heptad
-     register position on the first and last amino acid, e.g.
-     \dQuote{N..La..d}. This pattern matches a coiled coil sequence if
-     the sequence has an \sQuote{N} (Asparagine) at an \sQuote{a}
-     position and a \sQuote{L} (Leucine) at the next \sQuote{d}
-     position. For instance, the GCN4 wildtype has one occurrence of
-     this pattern:
-     \preformatted{%
-       MKQLEDKVEELLSKNYHLENEVARLKKLV
-       abcdefgabcdefgabcdefgabcdefga
-                     N..L
-                     a  d
-     }
+  The \pkg{procoil} package does not consider arbitrary
+  patterns, but only very specific ones: pairs of amino acids at
+  fixed register positions with no more than a maximum number
+  \eqn{m} of residues in between. Internally, these patterns are
+  represented as strings with an amino acid letter on the first
+  position, then a certain number of wildcards (between 0 and
+  \eqn{m} as noted above), then the second amino acid letter, and
+  an aligned sequence with the same number of wildcards and letters
+  \sQuote{a}-\sQuote{g} denoting the heptad
+  register position on the first and last amino acid, e.g.
+  \dQuote{N..La..d}. This pattern matches a coiled coil sequence if
+  the sequence has an \sQuote{N} (Asparagine) at an \sQuote{a}
+  position and a \sQuote{L} (Leucine) at the next \sQuote{d}
+  position. For instance, the GCN4 wildtype has one occurrence of
+  this pattern:
+  \preformatted{%
+    MKQLEDKVEELLSKNYHLENEVARLKKLV
+    abcdefgabcdefgabcdefgabcdefga
+                  N..L
+                  a  d
   }
 }
 \section{Slots}{
   \describe{
-    \item{\code{b}:}{Object of class \code{"numeric"} the value
+    \item{\code{b}:}{Object of class \code{numeric} the value
       \eqn{b} as described above}
-    \item{\code{m}:}{Object of class \code{"integer"} the value
+    \item{\code{m}:}{Object of class \code{integer} the value
       \eqn{m} as described above}
-    \item{\code{scaling}:}{Object of class \code{"logical"}
+    \item{\code{scaling}:}{Object of class \code{logical}
       indicating whether the model should employ
       kernel normalization}
     \item{\code{weights}:}{Object of class
-      \code{"matrix"} storing all pattern weights;
+      \code{matrix} storing all pattern weights;
       the matrix in this slot is actually consisting of only
       one row that contains the weights. The patterns are
       stored in column names of the matrix and encoded in 

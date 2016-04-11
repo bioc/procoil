@@ -33,10 +33,10 @@ the \pkg{kebabs} package directly and therefore inherits all its slots
 and methods. The following slots are defined for \code{CCProfile} objects
 additionally:
 \describe{
-  \item{\code{disc}:}{Object of class \code{"numeric"} containing
+  \item{\code{disc}:}{Object of class \code{numeric} containing
     the discriminant function value(s)
     (see \code{\linkS4class{CCModel}} for details)}
-  \item{\code{pred}:}{Object of class \code{"factor"} containing
+  \item{\code{pred}:}{Object of class \code{factor} containing
     the final classification(s). Upon a call to
     \code{\link[=predict,CCModel-method]{predict}},
     it is either \dQuote{trimer} or

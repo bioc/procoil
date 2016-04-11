@@ -4,7 +4,7 @@
 \alias{predict-methods}
 \alias{predict,CCModel-method}
 \alias{predict.CCModel}
-\title{Predict oligomerization of coiled coil segment}
+\title{Predict oligomerization of one or more coiled coil segments}
 \description{
   Function for predicting the oligomerization of one or multiple coiled
   coil segments
@@ -16,35 +16,35 @@
   \item{object}{The model to be considered; can either be one of the 
     models included in the package (\code{\link{PrOCoilModel}}
     and \code{\link{PrOCoilModelBA}}) or any other model loaded or
-    created by the user. For a detailed explanation of the two default models,
-    see\code{\linkS4class{CCModel}}.}
+    created by the user. For a detailed explanation of the two
+    default models, see \code{\linkS4class{CCModel}}.}
   \item{seq}{One or several amino acid sequences; valid
     characters are all uppercase letters except \sQuote{B},
     \sQuote{J}, \sQuote{O}, \sQuote{U}, \sQuote{X}, and
     \sQuote{Z}; invalid characters are tolerated, but ignored
-    by prediction. This argument can be a character vector,
+    by the prediction. This argument can be a character vector,
     an \code{\linkS4class{AAString}} object, an
     \code{\linkS4class{AAStringSet}} object, or an
     \code{\linkS4class{AAVector}} object}
   \item{reg}{a character vector containing the heptad register(s);
-    valid characters are the lowercase letters \sQuote{a} to
-    \sQuote{g} and dashes \sQuote{-}. Can also be omitted, see details
-    below.}
+    valid characters are the lowercase letters
+    \sQuote{a}-\sQuote{g} and dashes \sQuote{-}. Can also be omitted,
+    see details below.}
 }
 \details{
   The function \code{predict} is the most important one in the
   \pkg{procoil} package. It is used to apply a coiled coil
-  prediction model to a new coiled coil sequence. It uses the
+  prediction model to coiled coil sequences/segments. It uses the
   discriminant function described in \code{\linkS4class{CCModel}}.
   By default the final classification is computed on the basis of
-  the discriminant function value. If \eqn{f(x)>=0}, \eqn{x} is
-  predicted as trimer, otherwise as dimer.
+  the discriminant function value \eqn{f(x)}. If \eqn{f(x)>=0},
+  the sequence \eqn{x} is predicted as trimer, otherwise as dimer.
 
   If the \code{reg} argument is missing, \code{predict}
   looks whether the object passed as argument \code{seq}
   includes heptad register information, either as an attribute
-  \code{"reg"} (if \code{seq} is a character vector), as
-  metadata field \code{"reg"} (if \code{seq} is an
+  \code{reg} (if \code{seq} is a character vector), as
+  metadata field \code{reg} (if \code{seq} is an
   \code{\linkS4class{AAString}} or \code{\linkS4class{AAStringSet}}
   object), or via annotation metadata (if \code{seq} is
   an \code{\linkS4class{AAStringSet}} or \code{\linkS4class{AAVector}}
