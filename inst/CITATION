@@ -1,10 +1,5 @@
 citHeader("To cite package 'procoil' in publications use:")
 
-desc <- packageDescription("procoil")
-year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", desc$Date)
-vers <- paste("R package version", desc$Version)
-url  <- desc$URL
-
 citEntry(entry="Article",
          title=paste("Complex networks govern coiled coil oligomerization",
                      "--- predicting and profiling by means of a machine",
