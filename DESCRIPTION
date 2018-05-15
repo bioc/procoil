@@ -21,6 +21,7 @@ Collate: AllClasses.R access-methods.R show-methods.R
 	 profile-methods.R readCCModel.R writeCCModel.R
 	 fitted-methods.R heatmap-methods.R
 URL: http://www.bioinf.jku.at/software/procoil/
+     https://github.com/UBod/procoil
 VignetteBuilder: knitr
 LazyLoad: yes
 LazyData: yes
