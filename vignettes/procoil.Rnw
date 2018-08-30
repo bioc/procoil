@@ -358,8 +358,9 @@ The \PrOCoil\ \R\ package (current version: \PrOCoilVer) is
 available via Bioconductor. The simplest way to install the package
 is the following:
 <<InstallPrOCoil,eval=FALSE>>=
-source("http://www.bioconductor.org/biocLite.R")
-biocLite("procoil")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("procoil")
 @
 
 If you wish to install the package manually instead, you can download
