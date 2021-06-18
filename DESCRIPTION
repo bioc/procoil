@@ -1,8 +1,8 @@
 Package: procoil
 Type: Package
 Title: Prediction of Oligomerization of Coiled Coil Proteins
-Version: 2.21.0
-Date: 2021-04-29
+Version: 2.21.1
+Date: 2021-06-18
 Depends: R (>= 3.3.0), kebabs
 Imports: methods, stats, graphics, S4Vectors, Biostrings, utils
 Suggests: knitr

@@ -5,7 +5,7 @@ setMethod("plot", signature(x="CCProfile", y="missing"),
              heptads=TRUE, annotate=TRUE, ...)
     {
         ## workaround
-        if (identical(legend, "") || is.null(legend) || is.na(legend))
+        if (identical(legend, "") || is.null(legend) || any(is.na(legend)))
         {
             legend <- ""
             legendPos <- NA
