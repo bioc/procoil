@@ -1,14 +1,14 @@
 citHeader("To cite package 'procoil' in publications use:")
 
-citEntry(entry="Article",
+bibentry(bibtype="Article",
          title=paste("Complex networks govern coiled coil oligomerization",
                      "--- predicting and profiling by means of a machine",
                      "learning approach"),
-         author=personList(as.person("Carsten C. Mahrenholz"),
-                           as.person("Ingrid G. Abfalter"),
-                           as.person("Ulrich Bodenhofer"),
-                           as.person("Rudolf Volkmer"),
-                           as.person("Sepp Hochreiter")),
+         author=c(person(c("Carsten", "C."), "Mahrenholz"),
+                  person(c("Ingrid", "G."), "Abfalter"),
+                  person("Ulrich", "Bodenhofer"),
+                  person("Rudolf", "Volkmer"),
+                  person("Sepp", "Hochreiter")),
          journal="Mol. Cell. Proteomics",
          volume="10",
          number="5",
@@ -21,7 +21,7 @@ citEntry(entry="Article",
                    "Complex networks govern coiled coil oligomerization",
                    "- predicting and profiling by means of a machine",
                    "learning approach. Mol. Cell. Proteomics 10(5).",
-                   "DOI: 10.1074/mcp.M110.004994"))
+                   "DOI: 10.1074/mcp.M110.004994."))
 
 citFooter("To obtain the references in BibTeX format, enter",
           "'toBibtex(citation(\"procoil\"))'")

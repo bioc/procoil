@@ -1,4 +1,4 @@
-\documentclass[article]{bioinf}
+\documentclass{ubmanual}
 
 \usepackage{amsmath}
 \usepackage{hyperref}
@@ -9,10 +9,12 @@
    pdfauthor={Ulrich Bodenhofer}}
 
 \title{PrOCoil --- A Web Service and an \R\ Package for\\ Predicting the Oligomerization of\\ Coiled Coil Proteins}
-\author{Ulrich Bodenhofer}
-\affiliation{Institute of Bioinformatics, Johannes Kepler University
-Linz\\Altenberger Str. 69, 4040 Linz, Austria\\
-\email{procoil@bioinf.jku.at}}
+\author{Ulrich Bodenhofer\affilmark{1,2}}
+\affiliation{\affilmark{1} School of Informatics, Communication and Media\\
+University of Applied Sciences Upper Austria\\
+Softwarepark 11, 4232 Hagenberg, Austria\\[2mm]
+{\grey\affilmark{2} previously with: Institute of Bioinformatics,
+Johannes Kepler University\\Altenberger Str.\ 69, 4040 Linz, Austria}}
 
 \newcommand{\PrOCoil}{PrOCoil}
 \newcommand{\R}{R}
@@ -40,7 +42,7 @@ procoilDate <- paste(month.name[procoilDateMonth], " ",
 @
 \newcommand{\PrOCoilVer}{\Sexpr{procoilVersion}}
 \newcommand{\PrOCoilDate}{\Sexpr{procoilDate}}
-\manualtitlepage[Version \PrOCoilVer, \PrOCoilDate]
+\manualtitlepage{Version \PrOCoilVer, \PrOCoilDate}{https://github.com/UBod/procoil}
 
 \section*{Scope and Purpose of this Document}
 
@@ -72,7 +74,7 @@ literature on the subjects mentioned above.
 
 \newcommand{\notebox}[1]{%
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\begin{minipage}{\Nboxwidth}
+\fcolorbox{ubgr}{ubwh}{\begin{minipage}{\Nboxwidth}
 \noindent{\sffamily\bfseries Note:} #1
 \end{minipage}}
 \end{center}}
@@ -179,14 +181,12 @@ abcdefgabcdefgabcdefgabcdefgabcdefg
 
 \section{Predictions Using the Web Interface}\label{sec:webpredict}
 
-The \PrOCoil\ Web interface can be accessed directly via the
-\PrOCoil\
-homepage.\footnote{\url{http://www.bioinf.jku.at/software/procoil/}}
-The page contains an input field that is pre-filled with the GCN4
+The \PrOCoil\ Web interface (\url{http://www.bioinf.jku.at/software/procoil/})
+contains an input field that is pre-filled with the GCN4
 wild type as an example:
 
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{Input}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{Input}}
 \end{center}
 
 The \PrOCoil\ server first checks your input for validity (see
@@ -196,7 +196,7 @@ the standard example, the GCN4 wild type, the output looks as
 follows:
 
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{GCN4output}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{GCN4output}}
 \end{center}
 
 The output of the \PrOCoil\ Web interface is structured into three
@@ -246,7 +246,7 @@ its consecutive number and the corresponding start and end positions
 in the input sequence. For the above sample sequence, the output
 looks as follows:
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{MarcoilOut}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{MarcoilOut}}
 \end{center}
 
 The \PrOCoil\ Web interface also facilitates easy analysis of mutations of
@@ -256,7 +256,7 @@ conditions are met, the second sequence can simply be written underneath
 the heptad register (with the first sequence remaining above the heptad
 register):
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{MutationAnalysisInput}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{MutationAnalysisInput}}
 \end{center}
 
 The output is structured as described for single sequences. The section
@@ -266,7 +266,7 @@ more dimeric or more trimeric than the first sequence. Only one profile
 plot is produced in which both profiles are visualized, the profile of
 the first sequence in red and the second sequence's profile in blue:
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{MutationAnalysisOutput}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{MutationAnalysisOutput}}
 \end{center}
 
 
@@ -295,7 +295,7 @@ interface\footnote{\url{http://groups.csail.mit.edu/cb/paircoil2/paircoil2.html}
 produces the following kind of output for the Marcoil sample
 sequence:
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{PairCoil2output}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{PairCoil2output}}
 \end{center}
 
 If you click the link ``Positions and registers'', a text file with the
@@ -303,7 +303,7 @@ predicted heptad annotation is displayed. Select
 the lines with the amino acids and heptad annotations in the following
 way:
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{PairCoil2sel}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{PairCoil2sel}}
 \end{center}
 
 Now copy this selection into the
@@ -311,7 +311,7 @@ input field of the \PrOCoil\ Web interface. If you check ``Accept
 PairCoil2 output format'', you can directly process the PairCoil2
 output with \PrOCoil:
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{PairCoil2input}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{PairCoil2input}}
 \end{center}
 
 
@@ -325,21 +325,21 @@ be singled out by applying a probability cut-off threshold.
 This can be one as follows: first go to the ``Prob List'' tab and click ``Export'',
 then a plain text file with results is shown as follows:
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{Marcoil}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{Marcoil}}
 \end{center}
 As in the above screenshot, select the four-column table with
 residue numbers, residues, probabilities, and most probable heptad positions.
 Then copy and paste it into the text field at the bottom of the
 \PrOCoil\ Web page as follows:
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{MarcoilPreProc}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{MarcoilPreProc}}
 \end{center}
 
 After clicking ``Submit'', an output page is displayed that shows
 the result of applying the chosen probability cut-off in a read-only
 field at the bottom:
 \begin{center}
-\fcolorbox{bioaz}{biowh}{\includegraphics[scale=0.46]{MarcoilPreProcOut}}
+\fcolorbox{ubgr}{ubwh}{\includegraphics[scale=0.46]{MarcoilPreProcOut}}
 \end{center}
 If you are satisfied with the result, you
 can directly pass the data to \PrOCoil\ by clicking ``Proceed to
@@ -934,7 +934,7 @@ S.\ Hochreiter.
   and profiling by means of a machine learning approach.
 \newblock {\em Mol. Cell. Proteomics} 10(5), 2011.
 \newblock DOI:\
-\href{http://dx.doi.org/10.1074/mcp.M110.004994}{10.1074/mcp.M110.004994}
+\href{https://doi.org/10.1074/mcp.M110.004994}{10.1074/mcp.M110.004994}
 \end{quotation}
 
 \noindent To obtain this reference in Bib\TeX\ format, you can enter the

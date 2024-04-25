@@ -1,13 +1,13 @@
 Package: procoil
 Type: Package
 Title: Prediction of Oligomerization of Coiled Coil Proteins
-Version: 2.31.0
-Date: 2021-06-18
+Version: 2.31.1
+Date: 2024-04-25
 Depends: R (>= 3.3.0), kebabs
 Imports: methods, stats, graphics, S4Vectors, Biostrings, utils
 Suggests: knitr
-Author: Ulrich Bodenhofer
-Maintainer: Ulrich Bodenhofer <bodenhofer@bioinf.jku.at>
+Author: Ulrich Bodenhofer [aut,cre]
+Maintainer: Ulrich Bodenhofer <ulrich@bodenhofer.com>
 Description: The package allows for predicting whether a coiled coil sequence
 	     (amino acid sequence plus heptad register) is more likely to form
 	     a dimer or more likely to form a trimer. Additionally to the
@@ -20,8 +20,7 @@ Collate: AllClasses.R access-methods.R show-methods.R
 	 plot-methods.R predict-methods.R weights-methods.R
 	 profile-methods.R readCCModel.R writeCCModel.R
 	 fitted-methods.R heatmap-methods.R
-URL: http://www.bioinf.jku.at/software/procoil/
-     https://github.com/UBod/procoil
+URL: https://github.com/UBod/procoil
 VignetteBuilder: knitr
 LazyLoad: yes
 LazyData: yes

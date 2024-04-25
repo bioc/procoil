@@ -64,15 +64,15 @@
   respectively. So, by loading one of these files, the original models
   can still be used.
 }
-\references{\url{http://www.bioinf.jku.at/software/procoil/}
+\author{Ulrich Bodenhofer}
+\references{\url{https://github.com/UBod/procoil/}
 
   Mahrenholz, C.C., Abfalter, I.G., Bodenhofer, U., Volkmer, R., and
   Hochreiter, S. (2011) Complex networks govern coiled coil
   oligomerization - predicting and profiling by means of a machine
   learning approach. Mol. Cell. Proteomics 10(5):M110.004994.
-  DOI: 10.1074/mcp.M110.004994
+  DOI: \doi{10.1074/mcp.M110.004994}.
 }
-\author{Ulrich Bodenhofer \email{bodenhofer@bioinf.jku.at}}
 \seealso{\code{\link{procoil}}, \code{\link{CCModel-class}}}
 \examples{
 ## load small example model file for testing purposes

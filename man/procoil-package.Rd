@@ -28,14 +28,14 @@ registers aligned to them). The result is stored in a
 The resulting prediction profile can be visualized with
 \code{\link[=plot,CCProfile,missing-method]{plot}}.
 }
-\author{Ulrich Bodenhofer \email{bodenhofer@bioinf.jku.at}}
-\references{\url{http://www.bioinf.jku.at/software/procoil/}
+\author{Ulrich Bodenhofer}
+\references{\url{https://github.com/UBod/procoil/}
 
   Mahrenholz, C.C., Abfalter, I.G., Bodenhofer, U., Volkmer, R., and
   Hochreiter, S. (2011) Complex networks govern coiled coil
   oligomerization - predicting and profiling by means of a machine
   learning approach. Mol. Cell. Proteomics 10(5):M110.004994.
-  DOI: 10.1074/mcp.M110.004994
+  DOI: \doi{10.1074/mcp.M110.004994}.
 }
 \keyword{package}
 \examples{
