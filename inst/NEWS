@@ -7,6 +7,9 @@ It only mentions versions in which actual changes have been made
 within the Bioconductor release cycle without any actual change
 of code or documentation).
 
+Version 2.37.1:
+- updated DESCRIPTION file to new format (Authors@R)
+
 Version 2.31.1:
 - changed e-mail address of maintainer
 - updated README.md and formatting of package vignette

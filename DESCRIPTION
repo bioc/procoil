@@ -1,12 +1,15 @@
 Package: procoil
 Type: Package
 Title: Prediction of Oligomerization of Coiled Coil Proteins
-Version: 2.37.0
-Date: 2024-04-25
+Version: 2.37.1
+Date: 2025-09-19
 Depends: R (>= 3.3.0), kebabs
 Imports: methods, stats, graphics, S4Vectors, Biostrings, utils
 Suggests: knitr
-Author: Ulrich Bodenhofer [aut,cre]
+Authors@R: c(person(given = "Ulrich",
+                    family = "Bodenhofer",
+                    role = c("aut", "cre"),
+                    email = "ulrich@bodenhofer.com"))
 Maintainer: Ulrich Bodenhofer <ulrich@bodenhofer.com>
 Description: The package allows for predicting whether a coiled coil sequence
 	     (amino acid sequence plus heptad register) is more likely to form
